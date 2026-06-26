@@ -1,0 +1,61 @@
+name: 📚 Documentation
+description: Report missing, unclear, or incorrect documentation.
+title: "📚 docs: "
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for README updates, configuration examples, website content, and documentation corrections.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight
+      options:
+        - label: I have searched existing issues and discussions.
+          required: true
+
+  - type: dropdown
+    id: doc_area
+    attributes:
+      label: Documentation area
+      options:
+        - README
+        - Configuration schema
+        - Configuration example
+        - SQL dialect documentation
+        - Editor integration
+        - Website
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: location
+    attributes:
+      label: Location
+      description: Link to the page, section, file, or schema key that should be updated.
+      placeholder: "Example: README.md, jsonschema/nagi.json, format.case"
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue
+    attributes:
+      label: What should be changed?
+      description: Describe what is missing, incorrect, confusing, or outdated.
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested wording or example
+      description: If you have a proposed correction, paste it here.
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional context
+      description: Add screenshots, links, related issues, or references.
