@@ -1,0 +1,121 @@
+Nagi SQL Commercial License v1.0
+
+Copyright (c) 2026 nagi-sql
+
+This software is licensed, not sold.
+
+1. Definitions
+
+"Software" means the binaries, packages, distribution wrappers, documentation,
+and other materials distributed under the name "nagi-sql", including the
+compiled command-line interface ("CLI") and the npm / PyPI packages that
+download, install, or invoke it.
+
+"Compiled Components" means the compiled CLI and any other binary or object-code
+artifacts distributed as part of the Software.
+
+"Maintainer" means the copyright holder or an authorized seller of commercial
+licenses for the Software.
+
+"Free Functionality" means any functionality of the Software that the Maintainer
+makes available at no charge, including evaluation, community, or
+feature-limited use.
+
+"Fan Plan" means an active paid entitlement (such as a subscription) obtained
+from the Maintainer that unlocks additional or full functionality of the
+Software.
+
+"Plan Terms" means the then-current terms published by the Maintainer that
+describe each Fan Plan, including who is covered, activation and device limits,
+and how automated or shared environments are treated. The Plan Terms are
+incorporated into this license by reference.
+
+2. Grant Of Rights
+
+Subject to the terms of this license, the Maintainer grants you a limited,
+non-exclusive, non-transferable, revocable right to:
+
+- use, install, and run the Free Functionality, for any lawful purpose, without
+  charge and without the Maintainer's permission;
+- distribute unmodified copies of the Software only when this license file and
+  all copyright notices are included.
+
+This license grants no right to the source code of the Software. Source code is
+not distributed and is not made available under this license. Any source-form
+distribution wrappers that happen to be included in a package are provided only
+so that the Software can be installed and run, and do not constitute a grant of
+rights to the design, internals, or functionality of the Compiled Components.
+
+3. Fan Plan And Paid Functionality
+
+Some functionality may be restricted, disabled, or otherwise unavailable unless
+you hold an active Fan Plan.
+
+If you hold an active Fan Plan, you may use the additional functionality it
+enables only to the extent permitted by that Fan Plan. The scope of each Fan
+Plan — including who is covered, activation and device limits, and how automated
+or shared environments are treated — is defined in the Plan Terms.
+
+Use of the Software by automated systems (such as continuous integration) acting
+on behalf of, and within the entitlement of, a covered Fan Plan holder is
+permitted as part of that entitlement.
+
+You are responsible for ensuring your use stays within the scope of a current
+Fan Plan. Use beyond that scope requires a separate or upgraded entitlement. No
+right to use Fan Plan functionality is granted by this license without a valid,
+active Fan Plan.
+
+4. Restrictions
+
+You may not:
+
+- reverse engineer, decompile, disassemble, or otherwise attempt to derive the
+  source code, internal design, or algorithms of the Compiled Components, except
+  to the extent this restriction is prohibited by applicable law;
+- remove, bypass, disable, interfere with, or circumvent licensing, billing,
+  activation, usage-metering, or feature-gating controls;
+- use Fan Plan functionality without a valid, active Fan Plan;
+- modify, adapt, translate, or create derivative works of the Software, or
+  create, prepare, distribute, host, publish, or otherwise make available any
+  modified version of the Software, except as expressly authorized in writing by
+  the Maintainer;
+- sublicense, sell, rent, lease, or provide the Software as a standalone
+  commercial offering except as expressly authorized by the Maintainer;
+- misrepresent the origin of the Software or remove copyright, trademark, or
+  license notices.
+
+5. Ownership
+
+The Software is owned by the Maintainer. Except for the limited rights
+expressly granted above, all rights are reserved.
+
+6. Contributions
+
+Unless otherwise agreed in writing, any contribution intentionally submitted to
+the Maintainer or its repositories may be used, modified, relicensed, and
+distributed by the Maintainer without restriction or compensation.
+
+7. Termination
+
+This license terminates automatically if you violate its terms. Upon
+termination, you must stop using and distributing the Software, except where a
+separate Fan Plan or written agreement allows otherwise.
+
+8. Disclaimer
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
+
+9. Limitation Of Liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE MAINTAINER WILL NOT BE LIABLE FOR
+ANY INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES, OR FOR
+ANY LOSS OF DATA, REVENUE, PROFITS, GOODWILL, OR BUSINESS INTERRUPTION, ARISING
+OUT OF OR RELATING TO THE SOFTWARE OR THIS LICENSE.
+
+10. Commercial Licensing Contact
+
+For Fan Plans, the Plan Terms, and other commercial terms, contact:
+
+nagi-sql@outlook.com
