@@ -1,0 +1,90 @@
+name: 🚀 Feature Request
+description: Suggest a new capability or improvement for Nagi.
+title: "🚀 feat: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for new capabilities, behavior changes, and SQL dialect support requests.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight
+      options:
+        - label: I have searched existing issues and discussions.
+          required: true
+        - label: This is a feature request, not a bug report.
+          required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of Nagi would this affect?
+      options:
+        - Language Server
+        - Configuration schema
+        - Completion
+        - Diagnostics
+        - Formatting
+        - Linting
+        - SQL parsing
+        - SQL dialect support
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: dialect
+    attributes:
+      label: SQL dialect
+      description: Select the dialect most closely related to the request.
+      options:
+        - PostgreSQL
+        - Snowflake
+        - BigQuery
+        - MySQL
+        - SQLite
+        - Redshift
+        - Other / not dialect-specific
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user problem or workflow gap does this solve?
+      placeholder: Describe the workflow that is currently difficult or unsupported.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What should Nagi do?
+      placeholder: Describe the requested behavior or API.
+    validations:
+      required: true
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples
+      description: Include SQL, configuration, commands, or editor behavior examples.
+      render: sql
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Are there current workarounds or other designs you considered?
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional context
+      description: Add links to documentation, related tools, standards, or prior discussion.

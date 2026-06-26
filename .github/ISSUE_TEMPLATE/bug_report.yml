@@ -1,0 +1,119 @@
+name: 🐛 Bug Report
+description: Report a reproducible problem in Nagi.
+title: "🐛 bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a problem.
+        Please include enough detail for maintainers to reproduce the behavior.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight
+      options:
+        - label: I have searched existing issues and discussions.
+          required: true
+        - label: I can reproduce this with the latest available version.
+          required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of Nagi is affected?
+      options:
+        - Language Server
+        - Configuration schema
+        - Completion
+        - Diagnostics
+        - Formatting
+        - Linting
+        - SQL parsing
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: dialect
+    attributes:
+      label: SQL dialect
+      description: Select the dialect most closely related to the issue.
+      options:
+        - PostgreSQL
+        - Snowflake
+        - BigQuery
+        - MySQL
+        - SQLite
+        - Redshift
+        - Other / not dialect-specific
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_behavior
+    attributes:
+      label: Current behavior
+      description: What happened?
+      placeholder: Describe the observed behavior, including any error messages.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Provide the smallest reproduction you can.
+      placeholder: |
+        1. Create this configuration...
+        2. Open this SQL file...
+        3. Run this command...
+        4. Observe...
+    validations:
+      required: true
+
+  - type: textarea
+    id: sample_sql
+    attributes:
+      label: Minimal SQL example
+      description: Paste a minimal SQL snippet if this is related to parsing, completion, diagnostics, linting, or formatting.
+      render: sql
+
+  - type: textarea
+    id: configuration
+    attributes:
+      label: Configuration
+      description: Paste the relevant Nagi configuration, if any.
+      render: toml
+
+  - type: input
+    id: version
+    attributes:
+      label: Nagi version
+      placeholder: "Example: v0.0.0, commit SHA, or extension version"
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: "Example: macOS 15.5, VS Code 1.101.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional context
+      description: Add screenshots, logs, links, or other context.
