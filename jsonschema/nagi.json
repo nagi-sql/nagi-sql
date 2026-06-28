@@ -13,10 +13,20 @@
         }
       ]
     },
+    "lsp": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/LspOptions"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "format": {
       "anyOf": [
         {
-          "$ref": "#/definitions/FormatOptions"
+          "$ref": "#/definitions/FormatConfig"
         },
         {
           "type": "null"
@@ -26,7 +36,7 @@
     "lint": {
       "anyOf": [
         {
-          "$ref": "#/definitions/LintOptions"
+          "$ref": "#/definitions/LintConfig"
         },
         {
           "type": "null"
@@ -36,17 +46,7 @@
     "check": {
       "anyOf": [
         {
-          "$ref": "#/definitions/CheckOptions"
-        },
-        {
-          "type": "null"
-        }
-      ]
-    },
-    "extensions": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/ExtensionOptions"
+          "$ref": "#/definitions/TypeCheckOptions"
         },
         {
           "type": "null"
@@ -158,32 +158,32 @@
                 "type": "string"
               }
             },
-            "default_database": {
-              "type": [
-                "string",
-                "null"
-              ]
-            },
-            "default_schema": {
-              "type": [
-                "string",
-                "null"
-              ]
-            },
-            "function_files": {
+            "walk": {
               "anyOf": [
                 {
-                  "$ref": "#/definitions/Files"
+                  "$ref": "#/definitions/SourceWalkOptions"
                 },
                 {
                   "type": "null"
                 }
               ]
             },
-            "migrate": {
+            "default-database": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "default-schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "format": {
               "anyOf": [
                 {
-                  "$ref": "#/definitions/PostgresMigrateOptions"
+                  "$ref": "#/definitions/FeatureToggle"
                 },
                 {
                   "type": "null"
@@ -193,12 +193,41 @@
             "lint": {
               "anyOf": [
                 {
-                  "$ref": "#/definitions/PostgresLintOptions"
+                  "$ref": "#/definitions/PostgresSourceLintConfig"
                 },
                 {
                   "type": "null"
                 }
               ]
+            },
+            "check": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/FeatureToggle"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "migration": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/MigrationOptions"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "overrides": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "$ref": "#/definitions/SourceOverride"
+              }
             },
             "dialect": {
               "type": "string",
@@ -231,32 +260,32 @@
                 "type": "string"
               }
             },
-            "default_database": {
-              "type": [
-                "string",
-                "null"
-              ]
-            },
-            "default_schema": {
-              "type": [
-                "string",
-                "null"
-              ]
-            },
-            "function_files": {
+            "walk": {
               "anyOf": [
                 {
-                  "$ref": "#/definitions/Files"
+                  "$ref": "#/definitions/SourceWalkOptions"
                 },
                 {
                   "type": "null"
                 }
               ]
             },
-            "migrate": {
+            "default-database": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "default-schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "format": {
               "anyOf": [
                 {
-                  "$ref": "#/definitions/SnowflakeMigrateOptions"
+                  "$ref": "#/definitions/FeatureToggle"
                 },
                 {
                   "type": "null"
@@ -266,12 +295,41 @@
             "lint": {
               "anyOf": [
                 {
-                  "$ref": "#/definitions/SnowflakeLintOptions"
+                  "$ref": "#/definitions/SnowflakeSourceLintConfig"
                 },
                 {
                   "type": "null"
                 }
               ]
+            },
+            "check": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/FeatureToggle"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "migration": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/MigrationOptions"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "overrides": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "$ref": "#/definitions/SourceOverride"
+              }
             },
             "dialect": {
               "type": "string",
@@ -286,90 +344,47 @@
         }
       ]
     },
-    "Files": {
-      "title": "Files Configuration",
+    "SourceWalkOptions": {
       "type": "object",
       "properties": {
-        "include": {
-          "title": "A list of files to include in data source.",
-          "description": "The files are matched using the glob pattern syntax.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "exclude": {
-          "title": "A list of files to exclude from data source.",
-          "description": "The files are matched using the glob pattern syntax.",
-          "type": [
-            "array",
-            "null"
+        "standard-filters": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/BooleanDefaultTrue"
+            },
+            {
+              "type": "null"
+            }
           ],
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "include"
-      ]
-    },
-    "PostgresMigrateOptions": {
-      "type": "object",
-      "properties": {
-        "database_url": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "allow_destructive": {
-          "type": [
-            "boolean",
-            "null"
-          ]
-        },
-        "lock_timeout_ms": {
-          "type": [
-            "integer",
-            "null"
-          ],
-          "format": "uint64",
-          "minimum": 0
+          "default": true
         }
       },
       "additionalProperties": false
+    },
+    "BooleanDefaultTrue": {
+      "title": "Boolean wrapper with default `true`.",
+      "type": "boolean"
+    },
+    "FeatureToggle": {
+      "type": "string",
+      "enum": [
+        "on",
+        "off"
+      ]
+    },
+    "PostgresSourceLintConfig": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/FeatureToggle"
+        },
+        {
+          "$ref": "#/definitions/PostgresLintOptions"
+        }
+      ]
     },
     "PostgresLintOptions": {
       "type": "object",
       "properties": {
-        "rules": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/PostgresLintRules"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
-    "PostgresLintRules": {
-      "type": "object",
-      "properties": {
-        "select-star": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/RuleLevel"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
         "allowed-parameter-styles": {
           "anyOf": [
             {
@@ -383,19 +398,12 @@
       },
       "additionalProperties": false
     },
-    "RuleLevel": {
-      "type": "string",
-      "enum": [
-        "error",
-        "warn",
-        "off"
-      ]
-    },
     "ParameterStyleSet": {
       "type": "array",
       "items": {
         "$ref": "#/definitions/ParameterStyle"
-      }
+      },
+      "uniqueItems": true
     },
     "ParameterStyle": {
       "type": "string",
@@ -410,85 +418,109 @@
         "%(name)s"
       ]
     },
-    "SnowflakeMigrateOptions": {
+    "MigrationOptions": {
+      "title": "Migration Files Configuration",
+      "description": "Narrows the set of source files that contribute DDL (CREATE/ALTER/DROP\nTABLE, CREATE VIEW, CREATE FUNCTION, CREATE TYPE, CREATE INDEX, COMMENT)\nto the schema registry. Files that do not match `include`/`exclude` are\nstill parsed and type-checked as queries, but any DDL they contain is\nignored.\n\nWhen `include` is empty, the migration filter is disabled and every file\nmatched by the surrounding `sources.*.include`/`sources.*.exclude`\nbecomes a DDL source, preserving the previous behavior.",
       "type": "object",
       "properties": {
-        "account": {
-          "type": [
-            "string",
-            "null"
-          ]
+        "include": {
+          "title": "A list of migration files to include for DDL collection.",
+          "description": "The files are matched using the glob pattern syntax, evaluated\nrelative to the source root.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
         },
-        "user": {
+        "exclude": {
+          "title": "A list of migration files to exclude from DDL collection.",
+          "description": "The files are matched using the glob pattern syntax, evaluated\nrelative to the source root.",
           "type": [
-            "string",
-            "null"
-          ]
-        },
-        "password": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "warehouse": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "role": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "allow_destructive": {
-          "type": [
-            "boolean",
-            "null"
-          ]
-        },
-        "lock_timeout_ms": {
-          "type": [
-            "integer",
+            "array",
             "null"
           ],
-          "format": "uint64",
-          "minimum": 0
+          "items": {
+            "type": "string"
+          }
         }
       },
       "additionalProperties": false
+    },
+    "SourceOverride": {
+      "title": "Source File Override",
+      "description": "Applies source-local feature toggles to files matched by `include` and not\nmatched by `exclude`.",
+      "type": "object",
+      "properties": {
+        "include": {
+          "description": "Glob patterns matched relative to the source root.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclude": {
+          "description": "Glob patterns excluded relative to the source root.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "format": {
+          "description": "Override formatter enablement for matching files.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lint": {
+          "description": "Override linter enablement for matching files.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "check": {
+          "description": "Override type checker enablement for matching files.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "include"
+      ],
+      "x-tombi-table-keys-order": "schema"
+    },
+    "SnowflakeSourceLintConfig": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/FeatureToggle"
+        },
+        {
+          "$ref": "#/definitions/SnowflakeLintOptions"
+        }
+      ]
     },
     "SnowflakeLintOptions": {
       "type": "object",
       "properties": {
-        "rules": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/SnowflakeLintRules"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
-    "SnowflakeLintRules": {
-      "type": "object",
-      "properties": {
-        "select-star": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/RuleLevel"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
         "allowed-parameter-styles": {
           "anyOf": [
             {
@@ -517,29 +549,114 @@
         "workspace"
       ]
     },
-    "FormatOptions": {
-      "title": "Formatter options",
+    "LspOptions": {
+      "title": "LSP feature toggles",
       "type": "object",
       "properties": {
-        "enabled": {
-          "title": "Enable or disable SQL formatting",
-          "description": "- `true`: format SQL using `rules`\n- `false`: keep input layout (except for parser/printing minimum behavior)\n\nThis is useful when you want to keep lint enabled but temporarily pause formatter changes.",
+        "completion": {
           "anyOf": [
             {
-              "$ref": "#/definitions/BooleanDefaultTrue"
+              "$ref": "#/definitions/FeatureToggle"
             },
             {
               "type": "null"
             }
-          ],
-          "default": true
+          ]
         },
-        "rules": {
-          "title": "SQL formatting rules",
-          "description": "This object controls keyword case, indentation, line wrapping, etc.",
+        "diagnostics": {
           "anyOf": [
             {
-              "$ref": "#/definitions/FormatRules"
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "formatting": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "goto-definition": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "hover": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "inlay-hint": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "references": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rename": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "semantic-tokens": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "signature-help": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "workspace-diagnostics": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
             },
             {
               "type": "null"
@@ -548,30 +665,25 @@
         }
       },
       "additionalProperties": false,
-      "x-tombi-table-keys-order": "schema"
+      "x-tombi-table-keys-order": "ascending"
     },
-    "BooleanDefaultTrue": {
-      "title": "Boolean wrapper with default `true`.",
-      "type": "boolean"
+    "FormatConfig": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/FeatureToggle"
+        },
+        {
+          "$ref": "#/definitions/FormatOptions"
+        }
+      ]
     },
-    "FormatRules": {
+    "FormatOptions": {
+      "title": "Formatter options",
       "type": "object",
       "properties": {
-        "case": {
-          "title": "Case rules for SQL tokens and identifiers",
-          "description": "Groups case policies for keywords, data types, and function names.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/CaseRules"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
         "indent-style": {
           "title": "Indentation character style",
-          "description": "- `space`: use spaces\n- `tab`: use tabs\n\nThis affects indentation at clause boundaries and multiline lists.\n\n```sql\nSELECT\n    id\nFROM\n    users;\n# ^^^^ this indentation uses spaces or tabs\n```",
+          "description": "- `space`: use spaces\n- `tab`: use tabs\n\nThis affects indentation at clause boundaries and multiline lists.\n\n```sql\nSELECT\n    id\nFROM\n    users;\n-- ^ this indentation uses spaces or tabs\n```",
           "anyOf": [
             {
               "$ref": "#/definitions/IndentStyle"
@@ -583,7 +695,7 @@
         },
         "indent-width": {
           "title": "Indentation width per nesting level",
-          "description": "This option is applied when `indent-style = \"space\"`.\n\n```sql\nSELECT\n  id\nFROM\n  users;\n# ^^ width = 2 example\n```",
+          "description": "This option is applied when `indent-style = \"space\"`.\n\n```sql\nSELECT\n    id\nFROM\n    users;\n-- ^ width = 4 example\n```",
           "anyOf": [
             {
               "$ref": "#/definitions/IndentWidth"
@@ -604,192 +716,10 @@
               "type": "null"
             }
           ]
-        },
-        "paren-space-width": {
-          "title": "Spaces immediately inside parentheses",
-          "description": "Controls spacing after `(` and before `)`.\n\n```sql\n-- paren-space-width = 0\nSELECT func(a, b);\n\n-- paren-space-width = 1\nSELECT func( a, b );\n```",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/ParenSpaceWidth"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": 0
-        },
-        "last-semicolon": {
-          "title": "Policy for the last statement semicolon",
-          "description": "Controls the final `;` of formatted output.\n\n```sql\n-- last-semicolon = \"preserve\"\n-- input:  SELECT id FROM users\n-- output: SELECT id FROM users\n\n-- last-semicolon = \"always\"\n-- input:  SELECT id FROM users\n-- output: SELECT id FROM users;\n\n-- last-semicolon = \"never\"\n-- input:  SELECT id FROM users;\n-- output: SELECT id FROM users\n```",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/PreserveLastSemicolonPolicy"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "preserve"
-        },
-        "blank-lines": {
-          "title": "Blank-line rules between statements",
-          "description": "Controls vertical spacing such as:\n- max consecutive blank lines\n- blank lines inserted between statements",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BlankLines"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "transaction-indent": {
-          "title": "Indent statements inside explicit transactions",
-          "description": "```sql\nBEGIN;\n    INSERT INTO users (id, name) VALUES (1, 'Alice');\nCOMMIT;\n```\n\nWhen disabled, statements inside `BEGIN ... COMMIT` are kept at the same indentation level.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/TransactionIndent"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": true
-        }
-      },
-      "additionalProperties": false,
-      "x-tombi-table-keys-order": "ascending"
-    },
-    "CaseRules": {
-      "type": "object",
-      "properties": {
-        "keywords": {
-          "title": "The case style for SQL keywords",
-          "description": "Controls tokens like `SELECT`, `FROM`, `WHERE`, `INSERT`, `RETURNING`.\n\n```sql\n-- lowercase\nselect id from users;\n\n-- uppercase\nSELECT id FROM users;\n```",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/UpperCaseStyle"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "uppercase"
-        },
-        "datatypes": {
-          "title": "The case style for SQL data types",
-          "description": "Controls tokens like `INT`, `VARCHAR`, `TIMESTAMP WITH TIME ZONE`.\n\n```sql\n-- lowercase\nSELECT now()::timestamp with time zone;\n\n-- uppercase\nSELECT now()::TIMESTAMP WITH TIME ZONE;\n```",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/UpperCaseStyle"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "uppercase"
-        },
-        "functions": {
-          "title": "Case rules for function names",
-          "description": "Built-in, user-defined, and unknown functions can be configured independently.\n\nYou can also set a single string value like `functions = \"uppercase\"` to\napply the same case rule to all categories.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/FunctionCaseRules"
-            },
-            {
-              "type": "null"
-            }
-          ]
         }
       },
       "additionalProperties": false,
       "x-tombi-table-keys-order": "schema"
-    },
-    "UpperCaseStyle": {
-      "description": "Wrapper around `CaseStyle` for fields that default to uppercase.",
-      "allOf": [
-        {
-          "$ref": "#/definitions/CaseStyle"
-        }
-      ]
-    },
-    "CaseStyle": {
-      "oneOf": [
-        {
-          "description": "Render tokens in uppercase (for example, `SELECT`, `INT`).",
-          "type": "string",
-          "const": "uppercase"
-        },
-        {
-          "description": "Render tokens in lowercase (for example, `select`, `int`).",
-          "type": "string",
-          "const": "lowercase"
-        }
-      ]
-    },
-    "FunctionCaseRules": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/CaseStyle"
-        },
-        {
-          "$ref": "#/definitions/FunctionCaseStyleFeatures"
-        }
-      ]
-    },
-    "FunctionCaseStyleFeatures": {
-      "type": "object",
-      "properties": {
-        "built-in": {
-          "title": "The case style for built-in function names",
-          "description": "Applies to function names sourced from built-in definitions.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/UpperCaseStyle"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "uppercase"
-        },
-        "user-defined": {
-          "title": "The case style for user-defined function names",
-          "description": "Applies to function names defined by users in SQL sources or `.dsql`.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/LowerCaseStyle"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "lowercase"
-        },
-        "unknown": {
-          "title": "The case style for functions with unknown classification",
-          "description": "Applies when the formatter cannot classify a function as built-in or user-defined.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/LowerCaseStyle"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "lowercase"
-        }
-      },
-      "additionalProperties": false,
-      "x-tombi-table-keys-order": "schema"
-    },
-    "LowerCaseStyle": {
-      "description": "Wrapper around `CaseStyle` for fields that default to lowercase.",
-      "allOf": [
-        {
-          "$ref": "#/definitions/CaseStyle"
-        }
-      ]
     },
     "IndentStyle": {
       "title": "The style of indentation",
@@ -822,174 +752,36 @@
       "minimum": 0,
       "maximum": 255
     },
-    "ParenSpaceWidth": {
-      "title": "The number of spaces immediately inside parentheses.",
-      "type": "integer",
-      "format": "uint8",
-      "minimum": 0,
-      "maximum": 255
-    },
-    "PreserveLastSemicolonPolicy": {
-      "description": "Wrapper around `LastSemicolonPolicy` for fields that default to preserve.",
-      "allOf": [
+    "LintConfig": {
+      "anyOf": [
         {
-          "$ref": "#/definitions/LastSemicolonPolicy"
+          "$ref": "#/definitions/FeatureToggle"
+        },
+        {
+          "$ref": "#/definitions/LintOptions"
         }
       ]
-    },
-    "LastSemicolonPolicy": {
-      "oneOf": [
-        {
-          "description": "Keep input behavior for the final statement semicolon.",
-          "type": "string",
-          "const": "preserve"
-        },
-        {
-          "description": "Always emit a final statement semicolon.",
-          "type": "string",
-          "const": "always"
-        },
-        {
-          "description": "Never emit a final statement semicolon.",
-          "type": "string",
-          "const": "never"
-        }
-      ]
-    },
-    "BlankLines": {
-      "title": "Blank-line formatting options",
-      "description": "Controls vertical spacing between formatted SQL statements.\n\n```sql\nSELECT 1;\n\nSELECT 2;\n```",
-      "type": "object",
-      "properties": {
-        "max-consecutive": {
-          "title": "Maximum allowed consecutive blank lines",
-          "description": "If input has more blank lines than this value, extra lines are removed.\n\nDefault is `1`.",
-          "type": [
-            "integer",
-            "null"
-          ],
-          "format": "uint8",
-          "minimum": 0,
-          "maximum": 255
-        },
-        "between-statements": {
-          "title": "Blank lines inserted between statements",
-          "description": "```sql\nSELECT 1;\n\nSELECT 2;\n# ^ one blank line when value = 1\n```\n\nDefault is `1`.",
-          "type": [
-            "integer",
-            "null"
-          ],
-          "format": "uint8",
-          "minimum": 0,
-          "maximum": 255
-        }
-      },
-      "additionalProperties": false
-    },
-    "TransactionIndent": {
-      "title": "Indent statements inside explicit transactions",
-      "description": "Default is true.",
-      "type": "boolean"
     },
     "LintOptions": {
       "title": "Linter options",
       "type": "object",
-      "properties": {
-        "enabled": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultTrue"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": true
-        },
-        "rules": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/LintRules"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
       "additionalProperties": false,
       "x-tombi-table-keys-order": "schema"
     },
-    "LintRules": {
-      "type": "object",
-      "properties": {
-        "dialect-mapper": {
-          "description": "Report dialect-specific unsupported syntax. Default is error.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/RuleLevel"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "error"
+    "TypeCheckOptions": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/FeatureToggle"
         },
-        "select-star": {
-          "description": "Report SELECT * and qualified asterisk projections. Default is error.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/RuleLevel"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "error"
-        },
-        "dml-without-where": {
-          "description": "Report UPDATE or DELETE statements without WHERE. Default is error.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/RuleLevel"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "error"
-        },
-        "implicit-cross-join": {
-          "description": "Report comma-separated FROM items that imply a cross join. Default is error.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/RuleLevel"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "error"
+        {
+          "$ref": "#/definitions/TypeCheckOptionsTable"
         }
-      },
-      "additionalProperties": false,
-      "x-tombi-table-keys-order": "schema"
+      ]
     },
-    "CheckOptions": {
+    "TypeCheckOptionsTable": {
       "title": "Type checker options",
       "type": "object",
       "properties": {
-        "enabled": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultTrue"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": true
-        },
         "rules": {
           "anyOf": [
             {
@@ -1007,104 +799,8 @@
     "CheckRules": {
       "type": "object",
       "properties": {
-        "unknown-table": {
-          "description": "Report references to tables that are not defined across loaded SQL files. Default is error.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/RuleLevel"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "error"
-        },
-        "unknown-column": {
-          "description": "Report unknown column references. Default is error.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/RuleLevel"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "error"
-        },
-        "insert-values-count-mismatch": {
-          "description": "Report INSERT VALUES count mismatches. Default is error.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/RuleLevel"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "error"
-        },
-        "update-set-column-count-mismatch": {
-          "description": "Report UPDATE SET column/value count mismatches. Default is error.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/RuleLevel"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "error"
-        },
-        "set-operation-column-count-mismatch": {
-          "description": "Report set operation column count mismatches. Default is error.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/RuleLevel"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "error"
-        },
-        "assignment-type-mismatch": {
-          "description": "Report assignment expressions whose resolved type cannot flow into the target column. Default is error.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/RuleLevel"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "error"
-        },
-        "comparison-type-mismatch": {
-          "description": "Report incompatible types used in scalar comparisons. Default is error.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/RuleLevel"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "error"
-        },
-        "join-predicate-type-mismatch": {
-          "description": "Report incompatible types used in JOIN predicate comparisons. Default is error.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/RuleLevel"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "error"
-        },
-        "set-operation-type-mismatch": {
-          "description": "Report set operation columns that cannot coerce both sides to a common type. Default is error.",
+        "aggregate-function-context-mismatch": {
+          "description": "Report aggregate-only functions used outside valid SQL contexts. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1139,8 +835,44 @@
           ],
           "default": "error"
         },
-        "unknown-function": {
-          "description": "Report unknown function references. Default is error.",
+        "assignment-type-mismatch": {
+          "description": "Report assignment expressions whose resolved type cannot flow into the target column. Default is error.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "error"
+        },
+        "comparison-type-mismatch": {
+          "description": "Report incompatible types used in scalar comparisons. Default is error.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "error"
+        },
+        "dialect-mapper": {
+          "description": "Report dialect-mapper failures emitted from type-check analysis. Default is error.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "error"
+        },
+        "function-call-ambiguous": {
+          "description": "Report function calls that are ambiguous across supported overloads. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1175,68 +907,20 @@
           ],
           "default": "error"
         },
-        "dialect-mapper": {
-          "description": "Report dialect-mapper failures emitted from type-check analysis. Default is error.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/RuleLevel"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "error"
-        },
-        "function-call-ambiguous": {
-          "description": "Report ambiguous function calls across supported overloads. Default is error.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/RuleLevel"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "error"
-        },
-        "aggregate-function-context-mismatch": {
-          "description": "Report aggregate-only functions used outside valid SQL contexts. Default is error.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/RuleLevel"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "error"
-        },
-        "window-function-context-mismatch": {
-          "description": "Report window-only functions used without OVER (...). Default is error.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/RuleLevel"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "error"
-        },
-        "strict-function-nullable-argument": {
-          "description": "Report STRICT function calls with nullable arguments. Default is error.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/RuleLevel"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": "error"
-        },
         "function-not-immutable-in-context": {
           "description": "Report functions that must be IMMUTABLE in the current SQL context. Default is error.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "error"
+        },
+        "group-by-ordinal-refers-to-aggregate-or-window": {
+          "description": "Report GROUP BY ordinals that resolve to aggregate or window expressions. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1259,8 +943,128 @@
           ],
           "default": "error"
         },
-        "group-by-ordinal-refers-to-aggregate-or-window": {
-          "description": "Report GROUP BY ordinals that resolve to aggregate or window expressions. Default is error.",
+        "insert-values-count-mismatch": {
+          "description": "Report INSERT VALUES count mismatches. Default is error.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "error"
+        },
+        "join-predicate-type-mismatch": {
+          "description": "Report incompatible types used in JOIN predicate comparisons. Default is error.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "error"
+        },
+        "set-operation-column-count-mismatch": {
+          "description": "Report set operation column count mismatches. Default is error.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "error"
+        },
+        "set-operation-type-mismatch": {
+          "description": "Report set operation columns that cannot coerce both sides to a common type. Default is error.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "error"
+        },
+        "strict-function-nullable-argument": {
+          "description": "Report STRICT function calls with nullable arguments. Default is error.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "error"
+        },
+        "type-shadows-builtin": {
+          "description": "Report user-defined types that share a name with a built-in type. Default is warn.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "warn"
+        },
+        "unknown-column": {
+          "description": "Report unknown column references. Default is error.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "error"
+        },
+        "unknown-function": {
+          "description": "Report unknown function references. Default is error.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "error"
+        },
+        "unknown-table": {
+          "description": "Report references to tables that are not defined across loaded SQL files. Default is error.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "error"
+        },
+        "update-set-column-count-mismatch": {
+          "description": "Report UPDATE SET column/value count mismatches. Default is error.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "error"
+        },
+        "window-function-context-mismatch": {
+          "description": "Report window-only functions used without OVER (...). Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1275,381 +1079,13 @@
       "additionalProperties": false,
       "x-tombi-table-keys-order": "schema"
     },
-    "ExtensionOptions": {
-      "title": "Extension rule options",
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultTrue"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": true
-        },
-        "rules": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/ExtensionRules"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "additionalProperties": false,
-      "x-tombi-table-keys-order": "schema"
-    },
-    "ExtensionRules": {
-      "type": "object",
-      "properties": {
-        "built-in": {
-          "description": "Group for built-in rules that are broadly reusable across projects.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BuiltInExtensionRules"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "custom": {
-          "description": "Group for custom/project-specific rules.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/CustomExtensionRules"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "timezone-required-for-datetime": {
-          "description": "Require timezone-aware timestamp types. Default is true.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultTrue"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "date-columns-require-suffix": {
-          "description": "Require DATE columns to end with `_on`. Default is true.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultTrue"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "timestamp-columns-require-suffix": {
-          "description": "Require TIMESTAMP WITH TIME ZONE columns to end with `_at`. Default is true.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultTrue"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "audit-columns-require-not-null": {
-          "description": "Require `created_at` and `updated_at` to be NOT NULL. Default is true.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultTrue"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "table-requires-primary-key": {
-          "description": "Require all tables to have a PRIMARY KEY. Default is true.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultTrue"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "boolean-naming-convention": {
-          "description": "Require BOOLEAN columns to use `is_` or `has_` prefix. Default is disabled.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanNamingConvention"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "tenant-column-required": {
-          "description": "Require tenant tables to have a specific column. Default is disabled.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/TenantColumnRequired"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "created-at-immutable": {
-          "description": "Disallow updates to `created_at`. Default is disabled.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultFalse"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "mutation-requires-where": {
-          "description": "Require `UPDATE`/`DELETE` statements to include a `WHERE` clause. Default is disabled.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultFalse"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "tenant-filter-required": {
-          "description": "Require tenant-aware query statements to filter by a specific column. Default is disabled.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/TenantFilterRequired"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "additionalProperties": false,
-      "x-tombi-table-keys-order": "schema"
-    },
-    "BuiltInExtensionRules": {
-      "type": "object",
-      "properties": {
-        "timezone-required-for-datetime": {
-          "description": "Require timezone-aware timestamp types. Default is true.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultTrue"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "date-columns-require-suffix": {
-          "description": "Require DATE columns to end with `_on`. Default is true.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultTrue"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "timestamp-columns-require-suffix": {
-          "description": "Require TIMESTAMP WITH TIME ZONE columns to end with `_at`. Default is true.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultTrue"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "audit-columns-require-not-null": {
-          "description": "Require `created_at` and `updated_at` to be NOT NULL. Default is true.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultTrue"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "table-requires-primary-key": {
-          "description": "Require all tables to have a PRIMARY KEY. Default is true.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultTrue"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "created-at-immutable": {
-          "description": "Disallow updates to `created_at`. Default is disabled.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultFalse"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "mutation-requires-where": {
-          "description": "Require `UPDATE`/`DELETE` statements to include a `WHERE` clause. Default is disabled.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultFalse"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
-    "BooleanDefaultFalse": {
-      "title": "Boolean wrapper with default `false`.",
-      "type": "boolean"
-    },
-    "CustomExtensionRules": {
-      "type": "object",
-      "properties": {
-        "boolean-naming-convention": {
-          "description": "Require BOOLEAN columns to use `is_` or `has_` prefix. Default is disabled.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanNamingConvention"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "tenant-column-required": {
-          "description": "Require tenant tables to have a specific column. Default is disabled.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/TenantColumnRequired"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "tenant-filter-required": {
-          "description": "Require tenant-aware query statements to filter by a specific column. Default is disabled.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/TenantFilterRequired"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
-    "BooleanNamingConvention": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultTrue"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": true
-        },
-        "prefixes": {
-          "description": "Allowed prefixes for boolean columns. Default: `[\"is_\", \"has_\"]`.",
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "additionalProperties": false
-    },
-    "TenantColumnRequired": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultTrue"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": true
-        },
-        "column": {
-          "description": "The column name required on tenant tables. Default: `\"tenant_id\"`.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "marker-column": {
-          "description": "A marker column whose presence identifies a table as a tenant table.\nIf unset, the rule applies to all tables.",
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
-    "TenantFilterRequired": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultTrue"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": true
-        },
-        "column": {
-          "description": "The column name required in tenant-aware query filters. Default: `\"tenant_id\"`.",
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "additionalProperties": false
+    "RuleLevel": {
+      "type": "string",
+      "enum": [
+        "error",
+        "warn",
+        "ignore"
+      ]
     }
   }
 }
