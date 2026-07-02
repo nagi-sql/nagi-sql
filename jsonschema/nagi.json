@@ -691,7 +691,8 @@
             {
               "type": "null"
             }
-          ]
+          ],
+          "default": "space"
         },
         "indent-width": {
           "title": "Indentation width per nesting level",
@@ -703,7 +704,8 @@
             {
               "type": "null"
             }
-          ]
+          ],
+          "default": 4
         },
         "line-width": {
           "title": "Maximum target line width",
@@ -715,7 +717,8 @@
             {
               "type": "null"
             }
-          ]
+          ],
+          "default": 80
         }
       },
       "additionalProperties": false,
