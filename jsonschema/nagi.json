@@ -53,6 +53,16 @@
         }
       ]
     },
+    "rules": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/RulesConfig"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "sources": {
       "anyOf": [
         {
@@ -183,7 +193,7 @@
             "format": {
               "anyOf": [
                 {
-                  "$ref": "#/definitions/FeatureToggle"
+                  "$ref": "#/definitions/DisableToggle"
                 },
                 {
                   "type": "null"
@@ -203,7 +213,17 @@
             "check": {
               "anyOf": [
                 {
-                  "$ref": "#/definitions/FeatureToggle"
+                  "$ref": "#/definitions/DisableToggle"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "rules": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/BooleanDefaultTrue"
                 },
                 {
                   "type": "null"
@@ -285,7 +305,7 @@
             "format": {
               "anyOf": [
                 {
-                  "$ref": "#/definitions/FeatureToggle"
+                  "$ref": "#/definitions/DisableToggle"
                 },
                 {
                   "type": "null"
@@ -305,7 +325,17 @@
             "check": {
               "anyOf": [
                 {
-                  "$ref": "#/definitions/FeatureToggle"
+                  "$ref": "#/definitions/DisableToggle"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "rules": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/BooleanDefaultTrue"
                 },
                 {
                   "type": "null"
@@ -365,17 +395,16 @@
       "title": "Boolean wrapper with default `true`.",
       "type": "boolean"
     },
-    "FeatureToggle": {
+    "DisableToggle": {
       "type": "string",
       "enum": [
-        "on",
         "off"
       ]
     },
     "PostgresSourceLintConfig": {
       "anyOf": [
         {
-          "$ref": "#/definitions/FeatureToggle"
+          "$ref": "#/definitions/DisableToggle"
         },
         {
           "$ref": "#/definitions/PostgresLintOptions"
@@ -472,7 +501,7 @@
           "description": "Override formatter enablement for matching files.",
           "anyOf": [
             {
-              "$ref": "#/definitions/FeatureToggle"
+              "$ref": "#/definitions/DisableToggle"
             },
             {
               "type": "null"
@@ -483,7 +512,7 @@
           "description": "Override linter enablement for matching files.",
           "anyOf": [
             {
-              "$ref": "#/definitions/FeatureToggle"
+              "$ref": "#/definitions/DisableToggle"
             },
             {
               "type": "null"
@@ -494,7 +523,18 @@
           "description": "Override type checker enablement for matching files.",
           "anyOf": [
             {
-              "$ref": "#/definitions/FeatureToggle"
+              "$ref": "#/definitions/DisableToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rules": {
+          "description": "Override governance rule evaluation for matching files.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/BooleanDefaultTrue"
             },
             {
               "type": "null"
@@ -511,7 +551,7 @@
     "SnowflakeSourceLintConfig": {
       "anyOf": [
         {
-          "$ref": "#/definitions/FeatureToggle"
+          "$ref": "#/definitions/DisableToggle"
         },
         {
           "$ref": "#/definitions/SnowflakeLintOptions"
@@ -667,10 +707,17 @@
       "additionalProperties": false,
       "x-tombi-table-keys-order": "ascending"
     },
+    "FeatureToggle": {
+      "type": "string",
+      "enum": [
+        "on",
+        "off"
+      ]
+    },
     "FormatConfig": {
       "anyOf": [
         {
-          "$ref": "#/definitions/FeatureToggle"
+          "$ref": "#/definitions/DisableToggle"
         },
         {
           "$ref": "#/definitions/FormatOptions"
@@ -752,13 +799,13 @@
       "description": "Line width option with validation.",
       "type": "integer",
       "format": "uint8",
-      "minimum": 0,
+      "minimum": 1,
       "maximum": 255
     },
     "LintConfig": {
       "anyOf": [
         {
-          "$ref": "#/definitions/FeatureToggle"
+          "$ref": "#/definitions/DisableToggle"
         },
         {
           "$ref": "#/definitions/LintOptions"
@@ -774,7 +821,7 @@
     "TypeCheckOptions": {
       "anyOf": [
         {
-          "$ref": "#/definitions/FeatureToggle"
+          "$ref": "#/definitions/DisableToggle"
         },
         {
           "$ref": "#/definitions/TypeCheckOptionsTable"
@@ -1089,6 +1136,55 @@
         "warn",
         "ignore"
       ]
+    },
+    "RulesConfig": {
+      "title": "DEFINE RULE Configuration",
+      "description": "Configures workspace governance rule files and severity overrides. This\nis distinct from `[check.rules]`, which configures type-check diagnostics.",
+      "type": "object",
+      "properties": {
+        "include": {
+          "description": "Glob patterns for workspace governance rule files.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclude": {
+          "description": "Glob patterns excluded from the governance rule files.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "severity": {
+          "description": "Per-rule severity overrides.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleSeverity"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "include"
+      ],
+      "x-tombi-table-keys-order": "schema"
+    },
+    "RuleSeverity": {
+      "title": "DEFINE RULE Severity Overrides",
+      "description": "Maps governance rule names to their configured diagnostic level. Rule names\nmay use either `snake_case` or `kebab-case` spelling.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/RuleLevel"
+      },
+      "x-tombi-additional-key-label": "rule_name"
     }
   }
 }
