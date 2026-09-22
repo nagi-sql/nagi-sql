@@ -809,6 +809,18 @@
       "title": "Formatter options",
       "type": "object",
       "properties": {
+        "case": {
+          "title": "Case rules for SQL tokens and identifiers",
+          "description": "Groups case policies for identifiers, keywords, data types, and function names.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/CaseRules"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "indent-style": {
           "title": "Indentation character style",
           "description": "- `space`: use spaces\n- `tab`: use tabs\n\nThis affects indentation at clause boundaries and multiline lists.\n\n```sql\nSELECT\n    id\nFROM\n    users;\n-- ^ this indentation uses spaces or tabs\n```",
@@ -860,6 +872,153 @@
             }
           ],
           "default": "auto"
+        }
+      },
+      "additionalProperties": false,
+      "x-tombi-table-keys-order": "schema"
+    },
+    "CaseRules": {
+      "type": "object",
+      "properties": {
+        "identifiers": {
+          "title": "The case style for unquoted SQL identifiers",
+          "description": "Controls general identifiers such as database, schema, table, column,\nand alias names. Quoted identifiers preserve their source spelling.\n\n```sql\n-- lowercase\nSELECT account_id FROM analytics.daily_accounts;\n\n-- uppercase\nSELECT ACCOUNT_ID FROM ANALYTICS.DAILY_ACCOUNTS;\n```",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/LowerCaseStyle"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "lowercase"
+        },
+        "keywords": {
+          "title": "The case style for SQL keywords",
+          "description": "Controls tokens like `SELECT`, `FROM`, `WHERE`, `INSERT`, `RETURNING`.\n\n```sql\n-- lowercase\nselect id from users;\n\n-- uppercase\nSELECT id FROM users;\n```",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/UpperCaseStyle"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "uppercase"
+        },
+        "datatypes": {
+          "title": "The case style for SQL data types",
+          "description": "Controls tokens like `INT`, `VARCHAR`, `TIMESTAMP WITH TIME ZONE`.\n\nAccepts either a single case style applied to built-in data types, or\na table that splits the policy between built-in and user-defined types.\n\n```sql\n-- lowercase\nSELECT now()::timestamp with time zone;\n\n-- uppercase\nSELECT now()::TIMESTAMP WITH TIME ZONE;\n```",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/CategoryCaseRule"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": {
+            "built-in": "uppercase",
+            "user-defined": "lowercase"
+          }
+        },
+        "functions": {
+          "title": "The case style for function names",
+          "description": "Applies uniformly to every function name (built-in and user-defined\nalike). Unlike `datatypes`, this does not split by built-in vs.\nuser-defined: distinguishing them requires a per-dialect catalog of\nknown built-in function names, which formatters working from a single\nfile without semantic resolution do not have.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/UpperCaseStyle"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "uppercase"
+        }
+      },
+      "additionalProperties": false,
+      "x-tombi-table-keys-order": "schema"
+    },
+    "LowerCaseStyle": {
+      "description": "Wrapper around `CaseStyle` for fields that default to lowercase.",
+      "allOf": [
+        {
+          "$ref": "#/definitions/CaseStyle"
+        }
+      ]
+    },
+    "CaseStyle": {
+      "oneOf": [
+        {
+          "description": "Render tokens in uppercase (for example, `SELECT`, `INT`).",
+          "type": "string",
+          "const": "uppercase"
+        },
+        {
+          "description": "Render tokens in lowercase (for example, `select`, `int`).",
+          "type": "string",
+          "const": "lowercase"
+        }
+      ]
+    },
+    "UpperCaseStyle": {
+      "description": "Wrapper around `CaseStyle` for fields that default to uppercase.",
+      "allOf": [
+        {
+          "$ref": "#/definitions/CaseStyle"
+        }
+      ]
+    },
+    "CategoryCaseRule": {
+      "description": "Case policy for data types.\n\nAccepts either a single [`CaseStyle`] applied uniformly, or a table that\nsplits the policy between built-in and user-defined names.\n\n```toml\n# uniform: applies to every data type name\n[format.case]\ndatatypes = \"uppercase\"\n\n# split: built-in uppercase, user-defined lowercase\n[format.case.datatypes]\nbuilt-in = \"uppercase\"\nuser-defined = \"lowercase\"\n```",
+      "anyOf": [
+        {
+          "description": "A single case style applied to both built-in and user-defined names.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CaseStyle"
+            }
+          ]
+        },
+        {
+          "description": "Separate case styles for built-in and user-defined names.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CategoryCaseSplit"
+            }
+          ]
+        }
+      ]
+    },
+    "CategoryCaseSplit": {
+      "title": "Split case styles for built-in vs user-defined names",
+      "type": "object",
+      "properties": {
+        "built-in": {
+          "title": "Case style for built-in (dialect-provided) names",
+          "description": "Applies to names provided by the SQL dialect, such as built-in\nfunctions (`count`, `now`) or built-in data types (`int`, `text`).",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/UpperCaseStyle"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "uppercase"
+        },
+        "user-defined": {
+          "title": "Case style for names not recognized as built-in",
+          "description": "Applies to every name the formatter does not recognize as built-in.\nWorking from a single file without type resolution, the formatter\ncannot tell a genuine user-defined function/type from an unknown\nname, so both fall into this bucket.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/LowerCaseStyle"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "lowercase"
         }
       },
       "additionalProperties": false,
