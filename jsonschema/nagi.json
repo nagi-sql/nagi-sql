@@ -872,6 +872,30 @@
             }
           ],
           "default": "auto"
+        },
+        "statement-blank-lines": {
+          "title": "Blank lines between statements",
+          "description": "Accepts an exact count, or a table with an inclusive `minimum` and/or\n`maximum` bound.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/BlankLineLimit"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "comment-blank-lines": {
+          "title": "Blank lines around comments",
+          "description": "An integer applies to both sides. A table can configure `before` and\n`after` independently; each side accepts the same exact-count or\ninclusive-limit form as `statement-blank-lines`.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/CommentBlankLines"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "additionalProperties": false,
@@ -1075,6 +1099,89 @@
           "const": "crlf"
         }
       ]
+    },
+    "BlankLineLimit": {
+      "description": "A blank-line count, or an inclusive minimum/maximum limit.\n\nThe table form must contain at least one bound. When both are present,\n`minimum` must not exceed `maximum`.",
+      "anyOf": [
+        {
+          "type": "integer",
+          "format": "uint8",
+          "minimum": 0,
+          "maximum": 255
+        },
+        {
+          "$ref": "#/definitions/BlankLineRange"
+        }
+      ]
+    },
+    "BlankLineRange": {
+      "description": "Inclusive blank-line bounds.",
+      "type": "object",
+      "properties": {
+        "minimum": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint8",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "maximum": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint8",
+          "minimum": 0,
+          "maximum": 255
+        }
+      },
+      "additionalProperties": false,
+      "minProperties": 1,
+      "x-nagi-minimum-lte-maximum": true
+    },
+    "CommentBlankLines": {
+      "description": "Blank-line limits adjacent to comments.\n\nA single integer applies on both sides. The table form can configure the\n`before` and `after` sides independently, and must contain at least one.",
+      "anyOf": [
+        {
+          "type": "integer",
+          "format": "uint8",
+          "minimum": 0,
+          "maximum": 255
+        },
+        {
+          "$ref": "#/definitions/CommentBlankLineSpacing"
+        }
+      ]
+    },
+    "CommentBlankLineSpacing": {
+      "description": "Per-side blank-line limits for comments.",
+      "type": "object",
+      "properties": {
+        "before": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/BlankLineLimit"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "after": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/BlankLineLimit"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "minProperties": 1
     },
     "LintConfig": {
       "anyOf": [
