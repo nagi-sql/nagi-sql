@@ -13,10 +13,10 @@
         }
       ]
     },
-    "lsp": {
+    "sources": {
       "anyOf": [
         {
-          "$ref": "#/definitions/LspOptions"
+          "$ref": "#/definitions/Sources"
         },
         {
           "type": "null"
@@ -53,20 +53,10 @@
         }
       ]
     },
-    "rules": {
+    "lsp": {
       "anyOf": [
         {
-          "$ref": "#/definitions/RulesConfig"
-        },
-        {
-          "type": "null"
-        }
-      ]
-    },
-    "sources": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/Sources"
+          "$ref": "#/definitions/LspOptions"
         },
         {
           "type": "null"
@@ -153,6 +143,10 @@
           "description": "Configure a PostgreSQL source.",
           "type": "object",
           "properties": {
+            "dialect": {
+              "type": "string",
+              "const": "PostgreSQL"
+            },
             "include": {
               "type": "array",
               "items": {
@@ -193,7 +187,7 @@
             "format": {
               "anyOf": [
                 {
-                  "$ref": "#/definitions/DisableToggle"
+                  "$ref": "#/definitions/FormatConfig"
                 },
                 {
                   "type": "null"
@@ -213,17 +207,7 @@
             "check": {
               "anyOf": [
                 {
-                  "$ref": "#/definitions/DisableToggle"
-                },
-                {
-                  "type": "null"
-                }
-              ]
-            },
-            "rules": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/BooleanDefaultTrue"
+                  "$ref": "#/definitions/TypeCheckOptions"
                 },
                 {
                   "type": "null"
@@ -266,25 +250,26 @@
                 "null"
               ],
               "items": {
-                "$ref": "#/definitions/SourceOverride"
+                "$ref": "#/definitions/PostgresSourceOverride"
               }
-            },
-            "dialect": {
-              "type": "string",
-              "const": "PostgreSQL"
             }
           },
           "additionalProperties": false,
           "required": [
             "dialect",
             "include"
-          ]
+          ],
+          "x-tombi-table-keys-order": "schema"
         },
         {
           "title": "Snowflake Source",
           "description": "Configure a Snowflake source.",
           "type": "object",
           "properties": {
+            "dialect": {
+              "type": "string",
+              "const": "Snowflake"
+            },
             "include": {
               "type": "array",
               "items": {
@@ -325,7 +310,7 @@
             "format": {
               "anyOf": [
                 {
-                  "$ref": "#/definitions/DisableToggle"
+                  "$ref": "#/definitions/FormatConfig"
                 },
                 {
                   "type": "null"
@@ -345,17 +330,7 @@
             "check": {
               "anyOf": [
                 {
-                  "$ref": "#/definitions/DisableToggle"
-                },
-                {
-                  "type": "null"
-                }
-              ]
-            },
-            "rules": {
-              "anyOf": [
-                {
-                  "$ref": "#/definitions/BooleanDefaultTrue"
+                  "$ref": "#/definitions/TypeCheckOptions"
                 },
                 {
                   "type": "null"
@@ -398,19 +373,16 @@
                 "null"
               ],
               "items": {
-                "$ref": "#/definitions/SourceOverride"
+                "$ref": "#/definitions/SnowflakeSourceOverride"
               }
-            },
-            "dialect": {
-              "type": "string",
-              "const": "Snowflake"
             }
           },
           "additionalProperties": false,
           "required": [
             "dialect",
             "include"
-          ]
+          ],
+          "x-tombi-table-keys-order": "schema"
         }
       ]
     },
@@ -435,366 +407,6 @@
       "title": "Boolean wrapper with default `true`.",
       "type": "boolean"
     },
-    "DisableToggle": {
-      "type": "string",
-      "enum": [
-        "off"
-      ]
-    },
-    "PostgresSourceLintConfig": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/DisableToggle"
-        },
-        {
-          "$ref": "#/definitions/PostgresLintOptions"
-        }
-      ]
-    },
-    "PostgresLintOptions": {
-      "type": "object",
-      "properties": {
-        "allowed-parameter-styles": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/ParameterStyleSet"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
-    "ParameterStyleSet": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/ParameterStyle"
-      },
-      "uniqueItems": true
-    },
-    "ParameterStyle": {
-      "type": "string",
-      "enum": [
-        "$1",
-        "$name",
-        "?",
-        "?1",
-        ":name",
-        ":1",
-        "@name",
-        "%(name)s"
-      ]
-    },
-    "MigrationOptions": {
-      "title": "Migration Files Configuration",
-      "description": "Narrows the set of source files that contribute DDL (CREATE/ALTER/DROP\nTABLE, CREATE VIEW, CREATE FUNCTION, CREATE TYPE, CREATE INDEX, COMMENT)\nto the schema registry. Files that do not match `include`/`exclude` are\nstill parsed and type-checked as queries, but any DDL they contain is\nignored.\n\nWhen `include` is empty, the migration filter is disabled and every file\nmatched by the surrounding `sources.*.include`/`sources.*.exclude`\nbecomes a DDL source, preserving the previous behavior.",
-      "type": "object",
-      "properties": {
-        "include": {
-          "title": "A list of migration files to include for DDL collection.",
-          "description": "The files are matched using the glob pattern syntax, evaluated\nrelative to the source root.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "default": []
-        },
-        "exclude": {
-          "title": "A list of migration files to exclude from DDL collection.",
-          "description": "The files are matched using the glob pattern syntax, evaluated\nrelative to the source root.",
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "additionalProperties": false
-    },
-    "DbtOptions": {
-      "title": "dbt Authoring Discovery",
-      "description": "Enables artifact-independent discovery from one dbt project contained\nby the source root. The path is validated at the filesystem boundary;\nprofiles, credentials, environment variables, and dbt artifacts are not\nconfiguration inputs.",
-      "type": "object",
-      "properties": {
-        "project-root": {
-          "description": "Path to the dbt project root, relative to the surrounding source root.",
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "project-root"
-      ]
-    },
-    "SourceManifestConfig": {
-      "title": "Source Manifest Publication",
-      "description": "Opts one source into publishing the language-neutral query manifest.",
-      "type": "object",
-      "properties": {
-        "directory": {
-          "description": "Output directory relative to the `nagi.toml` that declares it.",
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "directory"
-      ]
-    },
-    "SourceOverride": {
-      "title": "Source File Override",
-      "description": "Applies source-local feature toggles to files matched by `include` and not\nmatched by `exclude`.",
-      "type": "object",
-      "properties": {
-        "include": {
-          "description": "Glob patterns matched relative to the source root.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "exclude": {
-          "description": "Glob patterns excluded relative to the source root.",
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "type": "string"
-          }
-        },
-        "format": {
-          "description": "Override formatter enablement for matching files.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/DisableToggle"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "lint": {
-          "description": "Override linter enablement for matching files.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/DisableToggle"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "check": {
-          "description": "Override type checker enablement for matching files.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/DisableToggle"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "rules": {
-          "description": "Override governance rule evaluation for matching files.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/BooleanDefaultTrue"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "include"
-      ],
-      "x-tombi-table-keys-order": "schema"
-    },
-    "SnowflakeSourceLintConfig": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/DisableToggle"
-        },
-        {
-          "$ref": "#/definitions/SnowflakeLintOptions"
-        }
-      ]
-    },
-    "SnowflakeLintOptions": {
-      "type": "object",
-      "properties": {
-        "allowed-parameter-styles": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/ParameterStyleSet"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
-    "InheritWorkspaceSource": {
-      "title": "Inherit Workspace Data Source",
-      "type": "object",
-      "properties": {
-        "workspace": {
-          "type": "boolean",
-          "enum": [
-            true
-          ]
-        },
-        "manifest": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/SourceManifestConfig"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "workspace"
-      ]
-    },
-    "LspOptions": {
-      "title": "LSP feature toggles",
-      "type": "object",
-      "properties": {
-        "completion": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/FeatureToggle"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "diagnostics": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/FeatureToggle"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "formatting": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/FeatureToggle"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "goto-definition": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/FeatureToggle"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "hover": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/FeatureToggle"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "inlay-hint": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/FeatureToggle"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "references": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/FeatureToggle"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "rename": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/FeatureToggle"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "semantic-tokens": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/FeatureToggle"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "signature-help": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/FeatureToggle"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "workspace-diagnostics": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/FeatureToggle"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "additionalProperties": false,
-      "x-tombi-table-keys-order": "ascending"
-    },
-    "FeatureToggle": {
-      "type": "string",
-      "enum": [
-        "on",
-        "off"
-      ]
-    },
     "FormatConfig": {
       "anyOf": [
         {
@@ -803,6 +415,12 @@
         {
           "$ref": "#/definitions/FormatOptions"
         }
+      ]
+    },
+    "DisableToggle": {
+      "type": "string",
+      "enum": [
+        "off"
       ]
     },
     "FormatOptions": {
@@ -896,6 +514,19 @@
               "type": "null"
             }
           ]
+        },
+        "trailing-comma": {
+          "title": "Trailing comma policy",
+          "description": "One policy for every place the SQL dialect accepts a trailing comma.\nA dialect with no such place (PostgreSQL) ignores it. Today the only\nplace is Snowflake's SELECT column list, which accepts\n`SELECT a, b, FROM t`.\n\n- `preserve`: keep the input as written (default).\n- `remove`: always remove it.\n- `multiline`: add it when the list is broken across lines, remove it\n  when the list fits on one line.\n- `magic`: an existing trailing comma keeps the list multiline and is\n  kept; a list without one never gains one.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/TrailingComma"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "preserve"
         }
       },
       "additionalProperties": false,
@@ -1183,21 +814,76 @@
       "additionalProperties": false,
       "minProperties": 1
     },
-    "LintConfig": {
+    "TrailingComma": {
+      "title": "Trailing comma policy",
+      "oneOf": [
+        {
+          "description": "Keep the input as written.",
+          "type": "string",
+          "const": "preserve"
+        },
+        {
+          "description": "Always remove the trailing comma.",
+          "type": "string",
+          "const": "remove"
+        },
+        {
+          "description": "Add it when the list is multiline, remove it otherwise.",
+          "type": "string",
+          "const": "multiline"
+        },
+        {
+          "description": "Keep an existing trailing comma, which also keeps the list multiline.",
+          "type": "string",
+          "const": "magic"
+        }
+      ]
+    },
+    "PostgresSourceLintConfig": {
       "anyOf": [
         {
           "$ref": "#/definitions/DisableToggle"
         },
         {
-          "$ref": "#/definitions/LintOptions"
+          "$ref": "#/definitions/PostgresLintOptions"
         }
       ]
     },
-    "LintOptions": {
-      "title": "Linter options",
+    "PostgresLintOptions": {
       "type": "object",
-      "additionalProperties": false,
-      "x-tombi-table-keys-order": "schema"
+      "properties": {
+        "allowed-parameter-styles": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ParameterStyleSet"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "ParameterStyleSet": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ParameterStyle"
+      },
+      "uniqueItems": true
+    },
+    "ParameterStyle": {
+      "type": "string",
+      "enum": [
+        "$1",
+        "$name",
+        "?",
+        "?1",
+        ":name",
+        ":1",
+        "@name",
+        "%(name)s"
+      ]
     },
     "TypeCheckOptions": {
       "anyOf": [
@@ -1518,20 +1204,78 @@
         "ignore"
       ]
     },
-    "RulesConfig": {
-      "title": "DEFINE RULE Configuration",
-      "description": "Configures workspace governance rule files and severity overrides. This\nis distinct from `[check.rules]`, which configures type-check diagnostics.",
+    "MigrationOptions": {
+      "title": "Migration Files Configuration",
+      "description": "Narrows the set of source files that contribute DDL (CREATE/ALTER/DROP\nTABLE, CREATE VIEW, CREATE FUNCTION, CREATE TYPE, CREATE INDEX, COMMENT)\nto the schema registry. Files that do not match `include`/`exclude` are\nstill parsed and type-checked as queries, but any DDL they contain is\nignored.\n\nWhen `include` is empty, the migration filter is disabled and every file\nmatched by the surrounding `sources.*.include`/`sources.*.exclude`\nbecomes a DDL source, preserving the previous behavior.",
       "type": "object",
       "properties": {
         "include": {
-          "description": "Glob patterns for workspace governance rule files.",
+          "title": "A list of migration files to include for DDL collection.",
+          "description": "The files are matched using the glob pattern syntax, evaluated\nrelative to the source root.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "exclude": {
+          "title": "A list of migration files to exclude from DDL collection.",
+          "description": "The files are matched using the glob pattern syntax, evaluated\nrelative to the source root.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "DbtOptions": {
+      "title": "dbt Authoring Discovery",
+      "description": "Enables artifact-independent discovery from one dbt project contained\nby the source root. The path is validated at the filesystem boundary;\nprofiles, credentials, environment variables, and dbt artifacts are not\nconfiguration inputs.",
+      "type": "object",
+      "properties": {
+        "project-root": {
+          "description": "Path to the dbt project root, relative to the surrounding source root.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "project-root"
+      ]
+    },
+    "SourceManifestConfig": {
+      "title": "Source Manifest Publication",
+      "description": "Opts one source into publishing the language-neutral query manifest.",
+      "type": "object",
+      "properties": {
+        "directory": {
+          "description": "Output directory relative to the `nagi.toml` that declares it.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "directory"
+      ]
+    },
+    "PostgresSourceOverride": {
+      "title": "PostgreSQL Source File Override",
+      "description": "Overrides the PostgreSQL source's `format`, `lint`, and `check` for files\nmatched by `include` and not matched by `exclude`. Each key is `\"off\"`\nor the same table the source accepts; omitted keys fall back to the\nsource.",
+      "type": "object",
+      "properties": {
+        "include": {
+          "description": "Glob patterns matched relative to the source root.",
           "type": "array",
           "items": {
             "type": "string"
           }
         },
         "exclude": {
-          "description": "Glob patterns excluded from the governance rule files.",
+          "description": "Glob patterns excluded relative to the source root.",
           "type": [
             "array",
             "null"
@@ -1540,11 +1284,30 @@
             "type": "string"
           }
         },
-        "severity": {
-          "description": "Per-rule severity overrides.",
+        "format": {
           "anyOf": [
             {
-              "$ref": "#/definitions/RuleSeverity"
+              "$ref": "#/definitions/FormatConfig"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lint": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/PostgresSourceLintConfig"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "check": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/TypeCheckOptions"
             },
             {
               "type": "null"
@@ -1558,14 +1321,257 @@
       ],
       "x-tombi-table-keys-order": "schema"
     },
-    "RuleSeverity": {
-      "title": "DEFINE RULE Severity Overrides",
-      "description": "Maps governance rule names to their configured diagnostic level. Rule names\nmay use either `snake_case` or `kebab-case` spelling.",
+    "SnowflakeSourceLintConfig": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/DisableToggle"
+        },
+        {
+          "$ref": "#/definitions/SnowflakeLintOptions"
+        }
+      ]
+    },
+    "SnowflakeLintOptions": {
       "type": "object",
-      "additionalProperties": {
-        "$ref": "#/definitions/RuleLevel"
+      "properties": {
+        "allowed-parameter-styles": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ParameterStyleSet"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
       },
-      "x-tombi-additional-key-label": "rule_name"
+      "additionalProperties": false
+    },
+    "SnowflakeSourceOverride": {
+      "title": "Snowflake Source File Override",
+      "description": "Overrides the Snowflake source's `format`, `lint`, and `check` for files\nmatched by `include` and not matched by `exclude`. Each key is `\"off\"`\nor the same table the source accepts; omitted keys fall back to the\nsource.",
+      "type": "object",
+      "properties": {
+        "include": {
+          "description": "Glob patterns matched relative to the source root.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclude": {
+          "description": "Glob patterns excluded relative to the source root.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "format": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FormatConfig"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lint": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/SnowflakeSourceLintConfig"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "check": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/TypeCheckOptions"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "include"
+      ],
+      "x-tombi-table-keys-order": "schema"
+    },
+    "InheritWorkspaceSource": {
+      "title": "Inherit Workspace Data Source",
+      "type": "object",
+      "properties": {
+        "workspace": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        },
+        "manifest": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/SourceManifestConfig"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "workspace"
+      ]
+    },
+    "LintConfig": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/DisableToggle"
+        },
+        {
+          "$ref": "#/definitions/LintOptions"
+        }
+      ]
+    },
+    "LintOptions": {
+      "title": "Linter options",
+      "type": "object",
+      "additionalProperties": false,
+      "x-tombi-table-keys-order": "schema"
+    },
+    "LspOptions": {
+      "title": "LSP feature toggles",
+      "type": "object",
+      "properties": {
+        "completion": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "diagnostics": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "formatting": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "goto-definition": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "hover": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "inlay-hint": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "references": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rename": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "semantic-tokens": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "signature-help": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "workspace-diagnostics": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FeatureToggle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "x-tombi-table-keys-order": "ascending"
+    },
+    "FeatureToggle": {
+      "type": "string",
+      "enum": [
+        "on",
+        "off"
+      ]
     }
   }
 }
