@@ -431,7 +431,9 @@
       "description": "A literal string, or `{ env, default }` read from the environment when the\nsource is analyzed. When `env` is unset and `default` is omitted, analysis\nof the source is skipped with an error.",
       "anyOf": [
         {
-          "type": "string"
+          "description": "Non-empty literal name.",
+          "type": "string",
+          "minLength": 1
         },
         {
           "$ref": "#/definitions/ConnectionEnv"
@@ -443,15 +445,18 @@
       "type": "object",
       "properties": {
         "env": {
-          "description": "Name of the environment variable.",
-          "type": "string"
+          "description": "Name of the environment variable. Must not be empty.",
+          "type": "string",
+          "minLength": 1
         },
         "default": {
-          "description": "Value used when the variable is not set.",
+          "description": "Value used when the variable is not set. Must not be empty.",
           "type": [
             "string",
             "null"
-          ]
+          ],
+          "minLength": 1,
+          "default": null
         }
       },
       "additionalProperties": false,
@@ -1306,8 +1311,9 @@
       "type": "object",
       "properties": {
         "directory": {
-          "description": "Output directory relative to the `nagi.toml` that declares it.",
-          "type": "string"
+          "description": "Output directory relative to the `nagi.toml` that declares it (not empty).",
+          "type": "string",
+          "minLength": 1
         }
       },
       "additionalProperties": false,
