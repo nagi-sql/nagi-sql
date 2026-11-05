@@ -162,26 +162,26 @@
                 "type": "string"
               }
             },
-            "walk": {
+            "respect-ignore-files": {
+              "description": "Respect `.gitignore` / `.ignore` and hidden-file filters while\ndiscovering this source's files.",
               "anyOf": [
                 {
-                  "$ref": "#/definitions/SourceWalkOptions"
+                  "$ref": "#/definitions/BooleanDefaultTrue"
                 },
                 {
                   "type": "null"
                 }
-              ]
+              ],
+              "default": true
             },
-            "default-database": {
-              "type": [
-                "string",
-                "null"
-              ]
-            },
-            "default-schema": {
-              "type": [
-                "string",
-                "null"
+            "connection": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/SourceConnection"
+                },
+                {
+                  "type": "null"
+                }
               ]
             },
             "format": {
@@ -234,10 +234,10 @@
                 }
               ]
             },
-            "manifest": {
+            "lineage": {
               "anyOf": [
                 {
-                  "$ref": "#/definitions/SourceManifestConfig"
+                  "$ref": "#/definitions/SourceLineageConfig"
                 },
                 {
                   "type": "null"
@@ -285,26 +285,26 @@
                 "type": "string"
               }
             },
-            "walk": {
+            "respect-ignore-files": {
+              "description": "Respect `.gitignore` / `.ignore` and hidden-file filters while\ndiscovering this source's files.",
               "anyOf": [
                 {
-                  "$ref": "#/definitions/SourceWalkOptions"
+                  "$ref": "#/definitions/BooleanDefaultTrue"
                 },
                 {
                   "type": "null"
                 }
-              ]
+              ],
+              "default": true
             },
-            "default-database": {
-              "type": [
-                "string",
-                "null"
-              ]
-            },
-            "default-schema": {
-              "type": [
-                "string",
-                "null"
+            "connection": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/SourceConnection"
+                },
+                {
+                  "type": "null"
+                }
               ]
             },
             "format": {
@@ -357,10 +357,10 @@
                 }
               ]
             },
-            "manifest": {
+            "lineage": {
               "anyOf": [
                 {
-                  "$ref": "#/definitions/SourceManifestConfig"
+                  "$ref": "#/definitions/SourceLineageConfig"
                 },
                 {
                   "type": "null"
@@ -386,26 +386,79 @@
         }
       ]
     },
-    "SourceWalkOptions": {
+    "BooleanDefaultTrue": {
+      "title": "Boolean wrapper with default `true`.",
+      "type": "boolean"
+    },
+    "SourceConnection": {
+      "title": "Source Connection",
+      "description": "Where unqualified object names of this source resolve. `schema` requires\n`database`.",
       "type": "object",
       "properties": {
-        "standard-filters": {
+        "database": {
+          "description": "Default database name, or the environment variable that supplies it.",
           "anyOf": [
             {
-              "$ref": "#/definitions/BooleanDefaultTrue"
+              "$ref": "#/definitions/ConnectionValue"
             },
             {
               "type": "null"
             }
-          ],
-          "default": true
+          ]
+        },
+        "schema": {
+          "description": "Default schema name, or the environment variable that supplies it.\nRequires `database`.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ConnectionValue"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "dependencies": {
+        "schema": [
+          "database"
+        ]
+      },
+      "x-tombi-table-keys-order": "schema"
     },
-    "BooleanDefaultTrue": {
-      "title": "Boolean wrapper with default `true`.",
-      "type": "boolean"
+    "ConnectionValue": {
+      "title": "Connection Value",
+      "description": "A literal string, or `{ env, default }` read from the environment when the\nsource is analyzed. When `env` is unset and `default` is omitted, analysis\nof the source is skipped with an error.",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/ConnectionEnv"
+        }
+      ]
+    },
+    "ConnectionEnv": {
+      "title": "Connection Environment Variable",
+      "type": "object",
+      "properties": {
+        "env": {
+          "description": "Name of the environment variable.",
+          "type": "string"
+        },
+        "default": {
+          "description": "Value used when the variable is not set.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "env"
+      ],
+      "x-tombi-table-keys-order": "schema"
     },
     "FormatConfig": {
       "anyOf": [
@@ -1247,9 +1300,9 @@
         "project-root"
       ]
     },
-    "SourceManifestConfig": {
-      "title": "Source Manifest Publication",
-      "description": "Opts one source into publishing the language-neutral query manifest.",
+    "SourceLineageConfig": {
+      "title": "Source Lineage Output",
+      "description": "Opts one source into writing its `nagi lineage` output (databases and\nnamed queries) as files, for external client generators.",
       "type": "object",
       "properties": {
         "directory": {
@@ -1416,10 +1469,10 @@
             true
           ]
         },
-        "manifest": {
+        "lineage": {
           "anyOf": [
             {
-              "$ref": "#/definitions/SourceManifestConfig"
+              "$ref": "#/definitions/SourceLineageConfig"
             },
             {
               "type": "null"
