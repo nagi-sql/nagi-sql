@@ -24,9 +24,10 @@
       ]
     },
     "format": {
+      "description": "`[format]` takes only `rules`. Unlike a source's `format`, the root\ncannot be `\"off\"`.",
       "anyOf": [
         {
-          "$ref": "#/definitions/FormatConfig"
+          "$ref": "#/definitions/FormatOptionsTable"
         },
         {
           "type": "null"
@@ -34,9 +35,10 @@
       ]
     },
     "lint": {
+      "description": "`[lint]` takes only `rules`. Unlike a source's `lint`, the root\ncannot be `\"off\"`.",
       "anyOf": [
         {
-          "$ref": "#/definitions/LintConfig"
+          "$ref": "#/definitions/LintOptions"
         },
         {
           "type": "null"
@@ -44,9 +46,10 @@
       ]
     },
     "check": {
+      "description": "`[check]` takes only `rules`. Unlike a source's `check`, the root\ncannot be `\"off\"`.",
       "anyOf": [
         {
-          "$ref": "#/definitions/TypeCheckOptions"
+          "$ref": "#/definitions/TypeCheckOptionsTable"
         },
         {
           "type": "null"
@@ -477,12 +480,13 @@
       "x-tombi-table-keys-order": "schema"
     },
     "FormatConfig": {
+      "description": "A source's or override's `format`: `\"off\"`, or `{ rules = { ... } }`.",
       "anyOf": [
         {
           "$ref": "#/definitions/DisableToggle"
         },
         {
-          "$ref": "#/definitions/FormatOptions"
+          "$ref": "#/definitions/FormatOptionsTable"
         }
       ]
     },
@@ -492,8 +496,29 @@
         "off"
       ]
     },
-    "FormatOptions": {
+    "FormatOptionsTable": {
       "title": "Formatter options",
+      "description": "`[format]` takes only `rules`; formatter settings live in `[format.rules]`.",
+      "type": "object",
+      "properties": {
+        "rules": {
+          "title": "Formatter rules",
+          "description": "The root `[format.rules]` is the fallback for every source;\n`sources.<name>.format.rules` and override `format = { rules = { ... } }`\noverride it key by key (`case` by category).",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/FormatOptions"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "x-tombi-table-keys-order": "schema"
+    },
+    "FormatOptions": {
+      "title": "Formatter rules",
       "type": "object",
       "properties": {
         "case": {
@@ -919,9 +944,34 @@
       ]
     },
     "PostgresLintOptions": {
+      "title": "PostgreSQL source linter options",
+      "description": "The table form of a PostgreSQL source's or override's `lint`; it takes only `rules`.",
+      "type": "object",
+      "properties": {
+        "rules": {
+          "title": "Lint rules for this source",
+          "description": "Overrides the root `[lint.rules]` rule by rule, and also takes\n`allowed-parameter-styles`.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/PostgresLintRules"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "x-tombi-table-keys-order": "schema"
+    },
+    "PostgresLintRules": {
+      "title": "PostgreSQL source lint rules",
+      "description": "`allowed-parameter-styles` and a severity (`error` / `warn` / `ignore`)\nper built-in lint rule.",
       "type": "object",
       "properties": {
         "allowed-parameter-styles": {
+          "title": "Allowed bind-parameter styles",
+          "description": "The bind-parameter placeholders this source's SQL may use.",
           "anyOf": [
             {
               "$ref": "#/definitions/ParameterStyleSet"
@@ -930,9 +980,46 @@
               "type": "null"
             }
           ]
+        },
+        "limit-requires-order-by": {
+          "description": "Report `LIMIT` without `ORDER BY`, which returns nondeterministic rows. Default is warn.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "warn"
+        },
+        "no-select-star": {
+          "description": "Report `SELECT *`; list columns explicitly. Default is ignore (off).",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "ignore"
+        },
+        "union-quantifier-explicit": {
+          "description": "Report `UNION` without `ALL` or `DISTINCT`. Default is ignore (off).",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "ignore"
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-tombi-table-keys-order": "schema"
     },
     "ParameterStyleSet": {
       "type": "array",
@@ -954,7 +1041,16 @@
         "%(name)s"
       ]
     },
+    "RuleLevel": {
+      "type": "string",
+      "enum": [
+        "error",
+        "warn",
+        "ignore"
+      ]
+    },
     "TypeCheckOptions": {
+      "description": "A source's or override's `check`: `\"off\"`, or `{ rules = { ... } }`.",
       "anyOf": [
         {
           "$ref": "#/definitions/DisableToggle"
@@ -966,9 +1062,12 @@
     },
     "TypeCheckOptionsTable": {
       "title": "Type checker options",
+      "description": "`[check]` takes only `rules`; check rule severities live in `[check.rules]`.",
       "type": "object",
       "properties": {
         "rules": {
+          "title": "Check rule severities",
+          "description": "The root `[check.rules]` is the fallback for every source;\n`sources.<name>.check.rules` and override `check = { rules = { ... } }`\noverride it rule by rule.",
           "anyOf": [
             {
               "$ref": "#/definitions/CheckRules"
@@ -1265,14 +1364,6 @@
       "additionalProperties": false,
       "x-tombi-table-keys-order": "schema"
     },
-    "RuleLevel": {
-      "type": "string",
-      "enum": [
-        "error",
-        "warn",
-        "ignore"
-      ]
-    },
     "MigrationOptions": {
       "title": "Migration Files Configuration",
       "description": "Narrows the set of source files that contribute DDL (CREATE/ALTER/DROP\nTABLE, CREATE VIEW, CREATE FUNCTION, CREATE TYPE, CREATE INDEX, COMMENT)\nto the schema registry. Files that do not match `include`/`exclude` are\nstill parsed and type-checked as queries, but any DDL they contain is\nignored.\n\nWhen `include` is empty, the migration filter is disabled and every file\nmatched by the surrounding `sources.*.include`/`sources.*.exclude`\nbecomes a DDL source, preserving the previous behavior.",
@@ -1402,9 +1493,34 @@
       ]
     },
     "SnowflakeLintOptions": {
+      "title": "Snowflake source linter options",
+      "description": "The table form of a Snowflake source's or override's `lint`; it takes only `rules`.",
+      "type": "object",
+      "properties": {
+        "rules": {
+          "title": "Lint rules for this source",
+          "description": "Overrides the root `[lint.rules]` rule by rule, and also takes\n`allowed-parameter-styles`.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/SnowflakeLintRules"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "x-tombi-table-keys-order": "schema"
+    },
+    "SnowflakeLintRules": {
+      "title": "Snowflake source lint rules",
+      "description": "`allowed-parameter-styles` and a severity (`error` / `warn` / `ignore`)\nper built-in lint rule.",
       "type": "object",
       "properties": {
         "allowed-parameter-styles": {
+          "title": "Allowed bind-parameter styles",
+          "description": "The bind-parameter placeholders this source's SQL may use.",
           "anyOf": [
             {
               "$ref": "#/definitions/ParameterStyleSet"
@@ -1413,9 +1529,46 @@
               "type": "null"
             }
           ]
+        },
+        "limit-requires-order-by": {
+          "description": "Report `LIMIT` without `ORDER BY`, which returns nondeterministic rows. Default is warn.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "warn"
+        },
+        "no-select-star": {
+          "description": "Report `SELECT *`; list columns explicitly. Default is ignore (off).",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "ignore"
+        },
+        "union-quantifier-explicit": {
+          "description": "Report `UNION` without `ALL` or `DISTINCT`. Default is ignore (off).",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "ignore"
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-tombi-table-keys-order": "schema"
     },
     "SnowflakeSourceOverride": {
       "title": "Snowflake Source File Override",
@@ -1502,19 +1655,69 @@
         "workspace"
       ]
     },
-    "LintConfig": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/DisableToggle"
-        },
-        {
-          "$ref": "#/definitions/LintOptions"
-        }
-      ]
-    },
     "LintOptions": {
       "title": "Linter options",
+      "description": "`[lint]` takes only `rules`; built-in lint settings live in `[lint.rules]`.",
       "type": "object",
+      "properties": {
+        "rules": {
+          "title": "Lint rule severities",
+          "description": "The fallback for every source; `sources.<name>.lint.rules` and\noverride `lint = { rules = { ... } }` override it rule by rule.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/LintRules"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "x-tombi-table-keys-order": "schema"
+    },
+    "LintRules": {
+      "title": "Lint rules",
+      "description": "Severity (`error` / `warn` / `ignore`) per built-in lint rule. `ignore`\nturns the rule off; `warn` / `error` turn it on with that severity.",
+      "type": "object",
+      "properties": {
+        "limit-requires-order-by": {
+          "description": "Report `LIMIT` without `ORDER BY`, which returns nondeterministic rows. Default is warn.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "warn"
+        },
+        "no-select-star": {
+          "description": "Report `SELECT *`; list columns explicitly. Default is ignore (off).",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "ignore"
+        },
+        "union-quantifier-explicit": {
+          "description": "Report `UNION` without `ALL` or `DISTINCT`. Default is ignore (off).",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RuleLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "ignore"
+        }
+      },
       "additionalProperties": false,
       "x-tombi-table-keys-order": "schema"
     },
