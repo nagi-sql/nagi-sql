@@ -416,6 +416,17 @@
               "type": "null"
             }
           ]
+        },
+        "role": {
+          "description": "Role the source's sessions connect as, or the environment variable that supplies it; it resolves \"$user\" in search_path. Omitted (or \"$user\") means unknown.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ConnectionValue"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "additionalProperties": false,
