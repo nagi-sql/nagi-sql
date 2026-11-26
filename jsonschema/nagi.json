@@ -93,7 +93,7 @@
         "sources": {
           "anyOf": [
             {
-              "$ref": "#/definitions/Sources"
+              "$ref": "#/definitions/WorkspaceSources"
             },
             {
               "type": "null"
@@ -107,36 +107,17 @@
       ],
       "x-tombi-table-keys-order": "schema"
     },
-    "Sources": {
-      "title": "Mapping of Data Sources",
+    "WorkspaceSources": {
+      "title": "Mapping of Workspace Data Sources",
+      "description": "`[workspace.sources.<name>]` holds definitions that a member uses with\n`[sources.<name>] workspace = true`. A definition cannot itself inherit.",
       "type": "object",
       "additionalProperties": false,
       "patternProperties": {
         "^[a-zA-Z][a-zA-Z0-9_]*$": {
-          "$ref": "#/definitions/SourceOrWorkspace"
+          "$ref": "#/definitions/Source"
         }
       },
       "x-tombi-additional-key-label": "source_name"
-    },
-    "SourceOrWorkspace": {
-      "anyOf": [
-        {
-          "description": "Use an explicit source definition.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/Source"
-            }
-          ]
-        },
-        {
-          "description": "Inherit source settings from workspace-level configuration.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/InheritWorkspaceSource"
-            }
-          ]
-        }
-      ]
     },
     "Source": {
       "title": "Source Dialect",
@@ -386,6 +367,77 @@
             "include"
           ],
           "x-tombi-table-keys-order": "schema"
+        }
+      ],
+      "allOf": [
+        {
+          "description": "With `lint = \"off\"` the source is neither linted nor type-checked, so an override's `lint` or `check` would have no effect: it is an error.",
+          "if": {
+            "properties": {
+              "lint": {
+                "const": "off"
+              }
+            },
+            "required": [
+              "lint"
+            ],
+            "additionalProperties": true
+          },
+          "then": {
+            "properties": {
+              "overrides": {
+                "items": {
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "lint"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "check"
+                        ]
+                      }
+                    ]
+                  },
+                  "additionalProperties": true
+                }
+              }
+            },
+            "additionalProperties": true
+          },
+          "additionalProperties": true
+        },
+        {
+          "description": "With `check = \"off\"` the source is not type-checked, so an override's `check` would have no effect: it is an error.",
+          "if": {
+            "properties": {
+              "check": {
+                "const": "off"
+              }
+            },
+            "required": [
+              "check"
+            ],
+            "additionalProperties": true
+          },
+          "then": {
+            "properties": {
+              "overrides": {
+                "items": {
+                  "not": {
+                    "required": [
+                      "check"
+                    ]
+                  },
+                  "additionalProperties": true
+                }
+              }
+            },
+            "additionalProperties": true
+          },
+          "additionalProperties": true
         }
       ]
     },
@@ -1393,13 +1445,22 @@
       "additionalProperties": false
     },
     "DbtOptions": {
-      "title": "dbt Authoring Discovery",
-      "description": "Enables artifact-independent discovery from one dbt project contained\nby the source root. The path is validated at the filesystem boundary;\nprofiles, credentials, environment variables, and dbt artifacts are not\nconfiguration inputs.",
+      "title": "dbt Relation Catalog",
+      "description": "Reads the relations of one dbt project contained by the source root\nfrom the manifest dbt generates. Both paths are relative to the\nsurrounding source root and must stay inside it; profiles, credentials\nand environment variables are not configuration inputs.",
       "type": "object",
       "properties": {
         "project-root": {
           "description": "Path to the dbt project root, relative to the surrounding source root.",
           "type": "string"
+        },
+        "manifest": {
+          "description": "Path to the dbt manifest, relative to the surrounding source root\n(not empty). Defaults to `<project-root>/target/manifest.json`.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "default": null
         }
       },
       "additionalProperties": false,
@@ -1408,19 +1469,56 @@
       ]
     },
     "SourceLineageConfig": {
-      "title": "Source Lineage Output",
-      "description": "Opts one source into writing its `nagi lineage` output (databases and\nnamed queries) as files, for external client generators.",
+      "description": "A source's `lineage`: `\"off\"`, or the table of its `nagi lineage` settings. Overrides have no `lineage`.",
+      "anyOf": [
+        {
+          "$ref": "#/definitions/DisableToggle"
+        },
+        {
+          "$ref": "#/definitions/SourceLineageTable"
+        }
+      ]
+    },
+    "SourceLineageTable": {
+      "title": "Source Lineage",
+      "description": "The `nagi lineage` settings of one source: where its output (databases\nand named queries) is written for external client generators, and how\nits SQL files name queries.",
       "type": "object",
       "properties": {
-        "directory": {
-          "description": "Output directory relative to the `nagi.toml` that declares it (not empty).",
-          "type": "string",
-          "minLength": 1
+        "output-files": {
+          "description": "The `.json` files that `nagi lineage` writes this source's document to,\neach relative to the `nagi.toml` that declares it. Every file gets the\nsame content, so clients in several languages can read one source's\nlineage. Each file at most once; empty (the default) writes no file.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\.json$"
+          },
+          "default": [],
+          "uniqueItems": true
+        },
+        "query-annotations": {
+          "description": "The query annotation styles the source's SQL files may use to name a\nquery: `\"nagi\"` (`-- nagi: query getUser`, always on, so it must be\nlisted) and `\"sqlc\"` (`-- name: getUser :one`). Each style at most once.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/QueryAnnotation"
+          },
+          "default": [
+            "nagi"
+          ],
+          "uniqueItems": true,
+          "contains": {
+            "const": "nagi"
+          }
         }
       },
-      "additionalProperties": false,
-      "required": [
-        "directory"
+      "additionalProperties": false
+    },
+    "QueryAnnotation": {
+      "title": "Query Annotation Style",
+      "description": "A way to name a query in a SQL file: `\"nagi\"` is `-- nagi: query getUser`,\n`\"sqlc\"` is sqlc's `-- name: getUser :one`.",
+      "type": "string",
+      "enum": [
+        "nagi",
+        "sqlc"
       ]
     },
     "PostgresSourceOverride": {
@@ -1629,24 +1727,46 @@
       ],
       "x-tombi-table-keys-order": "schema"
     },
+    "Sources": {
+      "title": "Mapping of Data Sources",
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-zA-Z][a-zA-Z0-9_]*$": {
+          "$ref": "#/definitions/SourceOrWorkspace"
+        }
+      },
+      "x-tombi-additional-key-label": "source_name"
+    },
+    "SourceOrWorkspace": {
+      "anyOf": [
+        {
+          "description": "Use an explicit source definition.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Source"
+            }
+          ]
+        },
+        {
+          "description": "Inherit source settings from workspace-level configuration.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/InheritWorkspaceSource"
+            }
+          ]
+        }
+      ]
+    },
     "InheritWorkspaceSource": {
       "title": "Inherit Workspace Data Source",
+      "description": "Uses `[workspace.sources.<name>]` as is. No other key is allowed; write\n`lineage` and the other settings in the workspace definition.",
       "type": "object",
       "properties": {
         "workspace": {
           "type": "boolean",
           "enum": [
             true
-          ]
-        },
-        "lineage": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/SourceLineageConfig"
-            },
-            {
-              "type": "null"
-            }
           ]
         }
       },
