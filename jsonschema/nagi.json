@@ -576,7 +576,7 @@
               "type": "null"
             }
           ],
-          "default": 4
+          "default": 2
         },
         "line-width": {
           "title": "Maximum target line width",
@@ -999,7 +999,7 @@
       "properties": {
         "allowed-parameter-styles": {
           "title": "Allowed bind-parameter styles",
-          "description": "The bind-parameter placeholders this source's SQL may use.",
+          "description": "The bind-parameter placeholders this source's SQL may use, as an array of styles: \"$1\", \"$name\", \"?\", \"?1\", \":name\", \":1\", \"@name\", \"%(name)s\"; a placeholder style that is not listed is a parse error.",
           "anyOf": [
             {
               "$ref": "#/definitions/ParameterStyleSet"
@@ -1010,7 +1010,7 @@
           ]
         },
         "no-select-star": {
-          "description": "Report `SELECT *`; list columns explicitly. Default is ignore (off).",
+          "description": "Reports `SELECT *`; list the columns explicitly so the query does not change when the table gains or loses a column. The rule is off by default; set it to `\"warn\"` or `\"error\"` to turn it on. Default is off.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1022,7 +1022,7 @@
           "default": "ignore"
         },
         "limit-requires-order-by": {
-          "description": "Report `LIMIT` without `ORDER BY`, which returns nondeterministic rows. Default is warn.",
+          "description": "Reports `LIMIT` without `ORDER BY`, which returns nondeterministic rows: which rows come back can change between runs. Default is warn.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1034,7 +1034,7 @@
           "default": "warn"
         },
         "union-quantifier-explicit": {
-          "description": "Report `UNION` without `ALL` or `DISTINCT`. Default is ignore (off).",
+          "description": "Reports `UNION` without `ALL` or `DISTINCT`, so the choice between keeping and removing duplicate rows is written down. The rule is off by default; set it to `\"warn\"` or `\"error\"` to turn it on. Default is off.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1046,7 +1046,7 @@
           "default": "ignore"
         },
         "duplicate-option": {
-          "description": "Report an option written more than once in one list where it may appear at most once. Default is warn.",
+          "description": "Reports an option written more than once in one list where PostgreSQL allows it at most once; PostgreSQL rejects such a statement with `conflicting or redundant options` when it runs. Which options are checked comes from the PostgreSQL grammar, and options PostgreSQL accepts repeated are not reported. Default is warn.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1058,7 +1058,7 @@
           "default": "warn"
         },
         "duplicate-list-element": {
-          "description": "Report a list element written more than once where it may appear at most once. Default is warn.",
+          "description": "Reports a list element written more than once where the element may appear at most once, such as a repeated column in a `COPY` column list; PostgreSQL rejects such a statement when it runs. Which lists are checked comes from the PostgreSQL grammar, and lists PostgreSQL accepts with repeats (for example `CREATE INDEX` columns) are not reported. Default is warn.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1070,7 +1070,7 @@
           "default": "warn"
         },
         "update-requires-where": {
-          "description": "Report `UPDATE` without `WHERE`, which may update every row. Default is warn.",
+          "description": "Reports `UPDATE` without `WHERE`, which may update every row in the table. Default is warn.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1082,7 +1082,7 @@
           "default": "warn"
         },
         "delete-requires-where": {
-          "description": "Report `DELETE` without `WHERE`, which may delete every row. Default is warn.",
+          "description": "Reports `DELETE` without `WHERE`, which may delete every row in the table. Default is warn.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1094,7 +1094,7 @@
           "default": "warn"
         },
         "json-parse-error": {
-          "description": "Report a `json` / `jsonb` string constant whose type the statement writes (`'…'::json`, `CAST('…' AS jsonb)`, `json '…'`) and that PostgreSQL 16's input function rejects. The same code from a catalog-typed constant (an `INSERT` / `UPDATE` value, a function argument) comes from check and takes this severity too. PostgreSQL only: a Snowflake source accepts the key and reports nothing. Default is error.",
+          "description": "Reports a `json` / `jsonb` string constant whose type the statement writes (`'…'::json`, `CAST('…' AS jsonb)`, `json '…'`) and that PostgreSQL 16's input function rejects, so a malformed document is found before it reaches the database. PostgreSQL only: a Snowflake source accepts the key and reports nothing. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1173,7 +1173,7 @@
       "type": "object",
       "properties": {
         "aggregate-function-context-mismatch": {
-          "description": "Report aggregate-only functions used outside valid SQL contexts. Default is error.",
+          "description": "Reports an aggregate function used where aggregates are not allowed (such as WHERE). Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1185,7 +1185,7 @@
           "default": "error"
         },
         "alias-column-count-mismatch": {
-          "description": "Report a table alias column list longer than the relation's columns. Default is error.",
+          "description": "Reports a column alias list that has more names than the table or subquery has columns. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1197,7 +1197,7 @@
           "default": "error"
         },
         "ambiguous-column": {
-          "description": "Report ambiguous column references. Default is error.",
+          "description": "Reports an unqualified column name that exists in more than one table of the query. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1209,7 +1209,7 @@
           "default": "error"
         },
         "array-literal-malformed": {
-          "description": "Report an array string constant that PostgreSQL 16's array input function rejects. Default is error.",
+          "description": "Reports a malformed PostgreSQL array literal, such as multidimensional sub-arrays with different lengths. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1221,7 +1221,7 @@
           "default": "error"
         },
         "case-when-condition-type-mismatch": {
-          "description": "Report a `CASE WHEN` condition that is not boolean. Default is error.",
+          "description": "Reports a CASE WHEN condition whose type is not boolean. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1233,7 +1233,7 @@
           "default": "error"
         },
         "cast-unresolved": {
-          "description": "Report a cast between types that has no cast. Default is error.",
+          "description": "Reports a value that needs an implicit cast to boolean in a WHERE, JOIN ON or HAVING condition but has no such cast. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1245,7 +1245,7 @@
           "default": "error"
         },
         "check-constraint-type-mismatch": {
-          "description": "Report a `CHECK` constraint condition that is not boolean. Default is error.",
+          "description": "Reports a CHECK constraint whose condition is not boolean. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1257,7 +1257,7 @@
           "default": "error"
         },
         "collation-not-supported-by-type": {
-          "description": "Report `COLLATE` applied to a type that has no collation. Default is error.",
+          "description": "Reports a COLLATE clause applied to a value whose type does not support collations (such as integer). Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1269,7 +1269,7 @@
           "default": "error"
         },
         "column-default-type-mismatch": {
-          "description": "Report a column `DEFAULT` whose type cannot be assigned to the column. Default is error.",
+          "description": "Reports a column DEFAULT value that cannot be assigned to the column type. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1281,7 +1281,7 @@
           "default": "error"
         },
         "common-value-type-mismatch": {
-          "description": "Report values that must share one type (`CASE` branches, `COALESCE`, `VALUES` columns, array elements) but have none in common. Default is error.",
+          "description": "Reports expression branches (CASE results, COALESCE arguments and similar) whose types have no common type. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1293,7 +1293,7 @@
           "default": "error"
         },
         "comparison-type-mismatch": {
-          "description": "Report incompatible types used in scalar comparisons. Default is error.",
+          "description": "Reports a comparison between two types that cannot be compared, such as integer and text. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1305,7 +1305,7 @@
           "default": "error"
         },
         "default-not-allowed": {
-          "description": "Report `DEFAULT` where PostgreSQL does not accept it. Default is error.",
+          "description": "Reports the DEFAULT keyword used where it is not accepted (it is only valid as an INSERT value or UPDATE assignment). Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1317,7 +1317,7 @@
           "default": "error"
         },
         "dropped-table": {
-          "description": "Report a read of a table an earlier `DROP` ended. Default is error.",
+          "description": "Reports a reference to a table that was dropped by an earlier statement. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1329,7 +1329,7 @@
           "default": "error"
         },
         "duplicate-alias": {
-          "description": "Report a table name or alias written more than once in one `FROM`. Default is error.",
+          "description": "Reports the same table name or alias used more than once in a FROM clause. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1341,7 +1341,7 @@
           "default": "error"
         },
         "duplicate-column": {
-          "description": "Report a column named more than once in one statement, or added to a table that has it. Default is error.",
+          "description": "Reports a column that is listed more than once in an `INSERT` column list. The statement would be rejected by the database. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1353,7 +1353,7 @@
           "default": "error"
         },
         "duplicate-relation": {
-          "description": "Report a `CREATE` of a relation that already exists. Default is error.",
+          "description": "Reports a `CREATE` that defines a table, view or other relation whose name already exists in the same schema. The later definition would fail. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1365,7 +1365,7 @@
           "default": "error"
         },
         "function-argument-count-mismatch": {
-          "description": "Report function argument count mismatches. Default is error.",
+          "description": "Reports a function call with a number of arguments that no overload accepts. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1377,7 +1377,7 @@
           "default": "error"
         },
         "function-argument-type-mismatch": {
-          "description": "Report function argument type mismatches. Default is error.",
+          "description": "Reports a function call whose argument types match none of the function's overloads, so the call would fail with \"function does not exist\". Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1389,7 +1389,7 @@
           "default": "error"
         },
         "function-argument-value-mismatch": {
-          "description": "Report a constant function argument the function rejects (such as a date/time part the input type does not have). Default is error.",
+          "description": "Reports a function call whose constant argument value is not allowed for the other arguments, for example a `DATEADD` date part that the input type does not support. Currently applies to the Snowflake dialect. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1401,7 +1401,7 @@
           "default": "error"
         },
         "function-call-ambiguous": {
-          "description": "Report function calls that are ambiguous across supported overloads. Default is error.",
+          "description": "Reports a function call whose arguments fit several overloads equally well (typically an untyped `NULL`), so the database cannot choose one. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1413,7 +1413,7 @@
           "default": "error"
         },
         "function-not-immutable-in-context": {
-          "description": "Report functions that must be IMMUTABLE in the current SQL context. Default is error.",
+          "description": "Reports a function that is not `IMMUTABLE` used where only immutable functions are allowed, such as a generated column expression. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1425,7 +1425,7 @@
           "default": "error"
         },
         "generated-column-write": {
-          "description": "Report a write to a generated column. Default is error.",
+          "description": "Reports an `INSERT` or `UPDATE` that writes a value to a generated column (or to a `GENERATED ALWAYS` identity column). The database computes these values and rejects the write. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1437,7 +1437,7 @@
           "default": "error"
         },
         "group-by-ordinal-refers-to-aggregate-or-window": {
-          "description": "Report GROUP BY ordinals that resolve to aggregate or window expressions. Default is error.",
+          "description": "Reports `GROUP BY <n>` where the n-th `SELECT` expression contains an aggregate or window function, which cannot be grouped by. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1449,7 +1449,7 @@
           "default": "error"
         },
         "group-by-select-expression-not-grouped": {
-          "description": "Report SELECT expressions that are neither grouped nor aggregated. Default is error.",
+          "description": "Reports a `SELECT` expression in a grouped query that is neither aggregated nor made only of `GROUP BY` expressions. Its value would be ambiguous per group. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1461,7 +1461,7 @@
           "default": "error"
         },
         "identity-column-state": {
-          "description": "Report an identity action on a column that cannot take it. Default is error.",
+          "description": "Reports an `ALTER TABLE ... ALTER COLUMN` identity change that the column's current state does not allow, for example adding identity to a nullable or non-integer column. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1473,7 +1473,7 @@
           "default": "error"
         },
         "insert-assignment-type-mismatch": {
-          "description": "Report an `INSERT` value whose type cannot be assigned to its column. Default is error.",
+          "description": "Reports an `INSERT` value whose type cannot be assigned to the target column's type. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1485,7 +1485,7 @@
           "default": "error"
         },
         "insert-values-count-mismatch": {
-          "description": "Report INSERT VALUES count mismatches. Default is error.",
+          "description": "Reports an `INSERT ... VALUES` row whose number of values differs from the number of target columns. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1497,7 +1497,7 @@
           "default": "error"
         },
         "invalid-literal-value": {
-          "description": "Report a typed string constant that the type's input function rejects. Default is error.",
+          "description": "Reports a quoted string constant that the target type's input function rejects (boolean, smallint, integer, bigint, numeric, uuid), where the value is converted implicitly or explicitly. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1509,7 +1509,7 @@
           "default": "error"
         },
         "invalid-relation-ddl": {
-          "description": "Report relation DDL PostgreSQL refuses (such as a temporary relation in a non-temporary schema). Default is error.",
+          "description": "Reports a temporary table, view or CTAS qualified with a non-temporary schema, which PostgreSQL rejects. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1521,7 +1521,7 @@
           "default": "error"
         },
         "invalid-view-column-list": {
-          "description": "Report a view column list longer than the view's columns. Default is error.",
+          "description": "Reports a view or materialized view column list that names more columns than the query returns. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1533,7 +1533,7 @@
           "default": "error"
         },
         "invalid-view-column-rename": {
-          "description": "Report a `CREATE OR REPLACE VIEW` that renames or reorders existing columns. Default is error.",
+          "description": "Reports a CREATE OR REPLACE VIEW that renames an existing view column. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1545,7 +1545,7 @@
           "default": "error"
         },
         "join-predicate-type-mismatch": {
-          "description": "Report incompatible types used in JOIN predicate comparisons. Default is error.",
+          "description": "Reports a JOIN ... ON condition that compares columns of incompatible types. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1557,7 +1557,7 @@
           "default": "error"
         },
         "json-duplicate-key": {
-          "description": "Report a `json` / `jsonb` string constant that names one object key twice. PostgreSQL accepts it (`jsonb` keeps the last value). Default is warn.",
+          "description": "Reports a JSON object literal that repeats a key, so one value is silently lost. Default is warn.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1569,7 +1569,7 @@
           "default": "warn"
         },
         "jsonpath-syntax-error": {
-          "description": "Report a `jsonpath` string constant that PostgreSQL 16's input function rejects. Default is error.",
+          "description": "Reports a JSON path string that PostgreSQL cannot parse. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1581,7 +1581,7 @@
           "default": "error"
         },
         "locking-clause-not-allowed": {
-          "description": "Report a locking clause (`FOR UPDATE` and the like) where PostgreSQL does not accept it. Default is error.",
+          "description": "Reports a locking clause such as FOR UPDATE on a statement where PostgreSQL does not allow it, such as a set operation. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1593,7 +1593,7 @@
           "default": "error"
         },
         "operator-ambiguous": {
-          "description": "Report an operator that is ambiguous for its operand types. Default is error.",
+          "description": "Reports an operator for which more than one candidate matches the operand types, so none can be chosen. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1605,7 +1605,7 @@
           "default": "error"
         },
         "operator-argument-type-mismatch": {
-          "description": "Report an operator that does not accept its operand types. Default is error.",
+          "description": "Reports an operator applied to operand types it does not support. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1617,7 +1617,7 @@
           "default": "error"
         },
         "parameter-type-mismatch": {
-          "description": "Report a bind parameter used as two incompatible types. Default is error.",
+          "description": "Reports a parameter used with conflicting types in the same statement. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1629,7 +1629,7 @@
           "default": "error"
         },
         "parameter-type-undetermined": {
-          "description": "Report a bind parameter whose type cannot be determined. Default is error.",
+          "description": "Reports a parameter whose type cannot be determined from its uses, so an explicit cast is needed. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1641,7 +1641,7 @@
           "default": "error"
         },
         "prefer-timestamptz": {
-          "description": "Report `timestamp` (without time zone) written as a type and suggest `timestamptz`. PostgreSQL only. Default is warn.",
+          "description": "Reports timestamp without time zone, which is ambiguous when the session time zone changes; prefer timestamptz. Default is warn.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1653,7 +1653,7 @@
           "default": "warn"
         },
         "recursive-query-type-mismatch": {
-          "description": "Report a recursive query whose recursive term's column types differ from the non-recursive term's. Default is error.",
+          "description": "Reports a WITH RECURSIVE query whose recursive term has a different type from the non-recursive term. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1665,7 +1665,7 @@
           "default": "error"
         },
         "scalar-subquery-column-count-mismatch": {
-          "description": "Report a scalar subquery that returns other than one column. Default is error.",
+          "description": "Reports a scalar subquery that returns more than one column. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1677,7 +1677,7 @@
           "default": "error"
         },
         "set-operation-column-count-mismatch": {
-          "description": "Report set operation column count mismatches. Default is error.",
+          "description": "Reports a `UNION`, `INTERSECT` or `EXCEPT` whose two sides return a different number of columns. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1689,7 +1689,7 @@
           "default": "error"
         },
         "set-operation-order-by-expression": {
-          "description": "Report an `ORDER BY` of a set operation that is not a result column. Default is error.",
+          "description": "Reports an `ORDER BY` on a `UNION`, `INTERSECT` or `EXCEPT` that uses an expression instead of an output column name or position. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1701,7 +1701,7 @@
           "default": "error"
         },
         "set-operation-type-mismatch": {
-          "description": "Report set operation columns that cannot coerce both sides to a common type. Default is error.",
+          "description": "Reports a `UNION`, `INTERSECT` or `EXCEPT` whose corresponding columns have types that cannot be coerced to a common type. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1713,7 +1713,7 @@
           "default": "error"
         },
         "undefined-relation": {
-          "description": "Report a `DROP` or `ALTER` of a relation that does not exist. Default is error.",
+          "description": "Reports a `DROP` or `ALTER` of a table, view or other relation that does not exist at that point (for example one that was already dropped earlier in the same file). The statement would fail at run time. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1725,7 +1725,7 @@
           "default": "error"
         },
         "unknown-column": {
-          "description": "Report unknown column references. Default is error.",
+          "description": "Reports a reference to a column that does not exist in the tables in scope. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1737,7 +1737,7 @@
           "default": "error"
         },
         "unknown-function": {
-          "description": "Report unknown function references. Default is error.",
+          "description": "Reports a call to a function that is not built in and not defined in the loaded SQL files. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1749,7 +1749,7 @@
           "default": "error"
         },
         "unknown-table": {
-          "description": "Report references to tables that are not defined across loaded SQL files. Default is error.",
+          "description": "Reports a reference to a table that is not defined in any of the loaded SQL files, for example in `FROM` or `INSERT INTO`. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1761,7 +1761,7 @@
           "default": "error"
         },
         "unsupported-alter-action": {
-          "description": "Report an `ALTER` action that cannot be performed on an existing relation. Default is error.",
+          "description": "Reports an `ALTER` action that PostgreSQL does not allow on the kind of relation it targets, such as adding a column to a view. The statement would fail. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1773,7 +1773,7 @@
           "default": "error"
         },
         "update-assignment-type-mismatch": {
-          "description": "Report an `UPDATE` value whose type cannot be assigned to its column. Default is error.",
+          "description": "Reports an `UPDATE ... SET` row assignment whose value cannot be assigned to the type of the target column. The statement would fail at run time. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1785,7 +1785,7 @@
           "default": "error"
         },
         "update-set-column-count-mismatch": {
-          "description": "Report UPDATE SET column/value count mismatches. Default is error.",
+          "description": "Reports an `UPDATE ... SET (a, b) = ...` where the number of columns differs from the number of values. The statement would be rejected. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1797,7 +1797,7 @@
           "default": "error"
         },
         "values-order-by-aggregate": {
-          "description": "Report an aggregate in the `ORDER BY` of a bare `VALUES`. Default is error.",
+          "description": "Reports an aggregate function in the `ORDER BY` of a `VALUES` list. PostgreSQL rejects it because a `VALUES` list has no grouping. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1809,7 +1809,7 @@
           "default": "error"
         },
         "values-row-length-mismatch": {
-          "description": "Report `VALUES` rows of different lengths. Default is error.",
+          "description": "Reports a `VALUES` list whose rows do not all have the same number of values. The statement would be rejected. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1821,7 +1821,7 @@
           "default": "error"
         },
         "window-function-context-mismatch": {
-          "description": "Report window-only functions used without OVER (...). Default is error.",
+          "description": "Reports a window-only function such as `ROW_NUMBER` that is called without `OVER (...)`. It is only valid as a window function. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -1833,7 +1833,7 @@
           "default": "error"
         },
         "wrong-object-type": {
-          "description": "Report a statement that names the wrong kind of relation (such as `DROP VIEW` of a table). Default is error.",
+          "description": "Reports a statement that names a relation of the wrong kind, such as `ALTER VIEW` on a table. The statement would fail. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -2050,7 +2050,7 @@
       "properties": {
         "allowed-parameter-styles": {
           "title": "Allowed bind-parameter styles",
-          "description": "The bind-parameter placeholders this source's SQL may use.",
+          "description": "The bind-parameter placeholders this source's SQL may use, as an array of styles: \"$1\", \"$name\", \"?\", \"?1\", \":name\", \":1\", \"@name\", \"%(name)s\"; a placeholder style that is not listed is a parse error.",
           "anyOf": [
             {
               "$ref": "#/definitions/ParameterStyleSet"
@@ -2061,7 +2061,7 @@
           ]
         },
         "no-select-star": {
-          "description": "Report `SELECT *`; list columns explicitly. Default is ignore (off).",
+          "description": "Reports `SELECT *`; list the columns explicitly so the query does not change when the table gains or loses a column. The rule is off by default; set it to `\"warn\"` or `\"error\"` to turn it on. Default is off.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -2073,7 +2073,7 @@
           "default": "ignore"
         },
         "limit-requires-order-by": {
-          "description": "Report `LIMIT` without `ORDER BY`, which returns nondeterministic rows. Default is warn.",
+          "description": "Reports `LIMIT` without `ORDER BY`, which returns nondeterministic rows: which rows come back can change between runs. Default is warn.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -2085,7 +2085,7 @@
           "default": "warn"
         },
         "union-quantifier-explicit": {
-          "description": "Report `UNION` without `ALL` or `DISTINCT`. Default is ignore (off).",
+          "description": "Reports `UNION` without `ALL` or `DISTINCT`, so the choice between keeping and removing duplicate rows is written down. The rule is off by default; set it to `\"warn\"` or `\"error\"` to turn it on. Default is off.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -2097,7 +2097,7 @@
           "default": "ignore"
         },
         "duplicate-option": {
-          "description": "Report an option written more than once in one list where it may appear at most once. Default is warn.",
+          "description": "Reports an option written more than once in one list where PostgreSQL allows it at most once; PostgreSQL rejects such a statement with `conflicting or redundant options` when it runs. Which options are checked comes from the PostgreSQL grammar, and options PostgreSQL accepts repeated are not reported. Default is warn.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -2109,7 +2109,7 @@
           "default": "warn"
         },
         "duplicate-list-element": {
-          "description": "Report a list element written more than once where it may appear at most once. Default is warn.",
+          "description": "Reports a list element written more than once where the element may appear at most once, such as a repeated column in a `COPY` column list; PostgreSQL rejects such a statement when it runs. Which lists are checked comes from the PostgreSQL grammar, and lists PostgreSQL accepts with repeats (for example `CREATE INDEX` columns) are not reported. Default is warn.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -2121,7 +2121,7 @@
           "default": "warn"
         },
         "update-requires-where": {
-          "description": "Report `UPDATE` without `WHERE`, which may update every row. Default is warn.",
+          "description": "Reports `UPDATE` without `WHERE`, which may update every row in the table. Default is warn.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -2133,7 +2133,7 @@
           "default": "warn"
         },
         "delete-requires-where": {
-          "description": "Report `DELETE` without `WHERE`, which may delete every row. Default is warn.",
+          "description": "Reports `DELETE` without `WHERE`, which may delete every row in the table. Default is warn.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
@@ -2145,7 +2145,7 @@
           "default": "warn"
         },
         "json-parse-error": {
-          "description": "Report a `json` / `jsonb` string constant whose type the statement writes (`'…'::json`, `CAST('…' AS jsonb)`, `json '…'`) and that PostgreSQL 16's input function rejects. The same code from a catalog-typed constant (an `INSERT` / `UPDATE` value, a function argument) comes from check and takes this severity too. PostgreSQL only: a Snowflake source accepts the key and reports nothing. Default is error.",
+          "description": "Reports a `json` / `jsonb` string constant whose type the statement writes (`'…'::json`, `CAST('…' AS jsonb)`, `json '…'`) and that PostgreSQL 16's input function rejects, so a malformed document is found before it reaches the database. PostgreSQL only: a Snowflake source accepts the key and reports nothing. Default is error.",
           "anyOf": [
             {
               "$ref": "#/definitions/RuleLevel"
